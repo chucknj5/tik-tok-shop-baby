@@ -1136,7 +1136,7 @@ const SCH_AMPM_DEF={'OPENING SHIFT':'AM','1st':'AM','MID SHIFT':'AM','2nd':'PM',
 U.sch={people:[],at:0,status:'',loading:false,open:false,shift:'',dept:''};
 const schCfg=()=>{let c={};try{c=JSON.parse(localStorage.getItem('lax_sch')||'{}')}catch(e){}return Object.assign({url:SCH_DEFAULT,ampm:{}},c)};
 const schSet=(k,v)=>{let c={};try{c=JSON.parse(localStorage.getItem('lax_sch')||'{}')}catch(e){}c[k]=v;try{localStorage.setItem('lax_sch',JSON.stringify(c))}catch(e){}};
-const SCH_DEFAULT='https://script.google.com/macros/s/AKfycbyl8YSnXgKJsInCeCxb5dIvwMJmNdVigI3vApg7uBkFdhSoB8Qfo-JrQCmVnTDgjkBQ2g/exec';
+const SCH_DEFAULT='https://script.google.com/macros/s/AKfycbwz9uIsRnfVgIZwpYZmBfthquJTEsyD6i2Pw5VgTmX_nsZSpCEpg2c_17edx-8VP1rDHw/exec';
 function schLab(v,map){if(v==null||v==='')return'';if(typeof v==='object'&&!Array.isArray(v))return String(v.label||map[v.value]||v.value||'').trim().toUpperCase()===''?'':String(v.label||map[v.value]||v.value).trim();return String(map[v]||v).trim()}
 function schNorm(r){
   const raw=JSON.stringify(r.o==null?'':r.o),up=raw.toUpperCase(),off=SCH_DAYS.filter(d=>up.includes(d)||raw.includes(Object.keys(SCH_DAY).find(k=>SCH_DAY[k]===d)));
