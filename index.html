@@ -7,7 +7,7 @@
 }
 @media (prefers-color-scheme:dark){:root:not([data-theme="light"]){
   --bg:#0e1514;--panel:#152220;--soft:#1a2a28;--ink:#e6f0ee;--mute:#92a6a2;--line:#27403c;
-  --brand:#2fb3a1;--brand-ink:#04211d;--early:#f0a928;--early-soft:#3a2c0b;--reg:#2fb3a1;--reg-soft:#12403a;
+  --brand:#2fb3a1;--brand-ink:#04211d;--early:#f0a928;--early-soft:#3a2c0b;--rehg:#2fb3a1;--reg-soft:#12403a;
   --bad:#f08a80;--good:#5fd39b;--focus:#2fb3a1;color-scheme:dark}}
 :root[data-theme="dark"]{
   --bg:#0e1514;--panel:#152220;--soft:#1a2a28;--ink:#e6f0ee;--mute:#92a6a2;--line:#27403c;
@@ -1009,9 +1009,9 @@ const ssCfg=()=>{let c={};try{c=JSON.parse(localStorage.getItem('lax_ss')||'{}')
 const ssSet=(k,v)=>{let c={};try{c=JSON.parse(localStorage.getItem('lax_ss')||'{}')}catch(e){}c[k]=v;try{localStorage.setItem('lax_ss',JSON.stringify(c))}catch(e){}};
 U.ws={recs:[],names:{},status:'',loading:false,at:0,open:false,q:'',timer:null};
 async function ssPost(path,body,method){
-  method=method||'POST';const c=ssCfg();
-  if(c.proxy){
-    const r=await fetch(c.proxy,{method:'POST',headers:{'Content-Type':'text/plain;charset=utf-8'},body:JSON.stringify({path,body,method})});
+  method=method||'POST';const c=ssCfg();let px=c.proxy;if(!px){try{px=(typeof schCfg==='function'&&schCfg().url)||''}catch(e){}}
+  if(px){
+    const r=await fetch(px,{method:'POST',headers:{'Content-Type':'text/plain;charset=utf-8'},body:JSON.stringify({path,body,method})});
     const j=JSON.parse(await r.text());if(j.status<200||j.status>=300)throw new Error('SmartSuite said '+j.status+': '+String(j.body).slice(0,160));return JSON.parse(j.body);
   }
   let r;
