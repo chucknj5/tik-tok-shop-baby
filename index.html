@@ -1,0 +1,1422 @@
+<!doctype html><meta charset=utf8><meta name=viewport content="width=device-width,initial-scale=1"><title>LAX Labor Request</title><meta name="claude:viewport-fit-sides" content="cover"><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@600;700&family=IBM+Plex+Mono:wght@500;600&family=IBM+Plex+Sans:wght@400;600;700&display=swap"><style id="css">/* Layout: sticky ops header, week toolbar, tab strip, one working panel. Teal brand with amber for early arrivals. */
+:root{
+  --bg:#f2f5f4;--panel:#ffffff;--soft:#f7faf9;--ink:#14201e;--mute:#5b6a67;--line:#d9e1df;
+  --brand:#0b5d54;--brand-ink:#ffffff;--early:#d98a00;--early-soft:#fdf1d8;--reg:#0b5d54;--reg-soft:#dcefeb;
+  --bad:#b3372c;--good:#1a7a4c;--focus:#0b5d54;
+  --display:'Barlow Condensed','Arial Narrow',sans-serif;--body:'IBM Plex Sans',system-ui,-apple-system,'Segoe UI',sans-serif;--mono:'IBM Plex Mono',ui-monospace,Menlo,Consolas,monospace;
+}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){
+  --bg:#0e1514;--panel:#152220;--soft:#1a2a28;--ink:#e6f0ee;--mute:#92a6a2;--line:#27403c;
+  --brand:#2fb3a1;--brand-ink:#04211d;--early:#f0a928;--early-soft:#3a2c0b;--reg:#2fb3a1;--reg-soft:#12403a;
+  --bad:#f08a80;--good:#5fd39b;--focus:#2fb3a1;color-scheme:dark}}
+:root[data-theme="dark"]{
+  --bg:#0e1514;--panel:#152220;--soft:#1a2a28;--ink:#e6f0ee;--mute:#92a6a2;--line:#27403c;
+  --brand:#2fb3a1;--brand-ink:#04211d;--early:#f0a928;--early-soft:#3a2c0b;--reg:#2fb3a1;--reg-soft:#12403a;
+  --bad:#f08a80;--good:#5fd39b;--focus:#2fb3a1;color-scheme:dark}
+*{box-sizing:border-box}
+body{background:var(--bg);color:var(--ink);font:14px/1.45 var(--body);padding-block:0;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px))}
+.wrap{max-width:1280px;margin:0 auto;padding-block:16px 40px}
+button,input,select{font:inherit;color:inherit}
+button{border:1px solid var(--line);background:var(--panel);border-radius:6px;padding:7px 12px;cursor:pointer;font-weight:600}
+button:hover{border-color:var(--brand)}
+button.pri{background:var(--brand);border-color:var(--brand);color:var(--brand-ink)}
+button:disabled{opacity:.45;cursor:not-allowed}
+button.danger{color:var(--bad)}
+:focus-visible{outline:2px solid var(--focus);outline-offset:1px}
+.top{display:flex;flex-wrap:wrap;gap:12px 20px;align-items:flex-end;justify-content:space-between;margin-bottom:14px}
+.eyebrow{font-size:11px;letter-spacing:.14em;text-transform:uppercase;color:var(--mute);font-weight:600}
+h1{font:700 34px/1 var(--display);letter-spacing:.02em;text-transform:uppercase;margin:2px 0 0;text-wrap:balance}
+h1 span{color:var(--brand)}
+.save{display:flex;gap:10px;align-items:center;flex-wrap:wrap}
+.stat{font-size:12px;font-weight:600;color:var(--good)}.stat.dirty{color:var(--early)}.stat.ro{color:var(--mute)}
+.bar{display:flex;flex-wrap:wrap;gap:10px 14px;align-items:flex-end;background:var(--panel);border:1px solid var(--line);border-radius:10px;padding:10px 12px;margin-bottom:12px}
+.bar label{display:flex;flex-direction:column;gap:3px;font-size:10.5px;letter-spacing:.08em;text-transform:uppercase;color:var(--mute);font-weight:600}
+.bar input,.bar select{border:1px solid var(--line);border-radius:6px;padding:6px 8px;background:var(--soft);min-width:0;font-size:14px;letter-spacing:0;text-transform:none;font-weight:400}
+.bar .sp{flex:1}
+.drop{border:2px dashed var(--line);border-radius:12px;padding:22px 16px;color:var(--mute);font-size:13px;display:flex;flex-direction:column;gap:4px;align-items:center;text-align:center;margin-bottom:12px;background:var(--panel);cursor:pointer}
+.drop b{font:700 20px/1.1 var(--display);letter-spacing:.04em;text-transform:uppercase;color:var(--ink)}
+.drop:hover,.drop.over{border-color:var(--brand);background:var(--reg-soft);color:var(--ink)}
+.tabs{display:flex;gap:4px;flex-wrap:wrap;border-bottom:2px solid var(--brand)}
+.tab{padding:7px 14px 6px;border-radius:8px 8px 0 0;background:var(--soft);border:1px solid var(--line);border-bottom:0;cursor:pointer;font-weight:700;font-size:13px;color:var(--mute);user-select:none;line-height:1.15;text-align:center}
+.tab small{display:block;font-weight:500;font-size:11px;font-variant-numeric:tabular-nums}
+.tab.on{background:var(--brand);border-color:var(--brand);color:var(--brand-ink)}
+.tab .n{display:block;font:600 11px var(--mono)}
+.panel{background:var(--panel);border:1px solid var(--line);border-top:0;border-radius:0 0 10px 10px;padding:16px}
+.kpis{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:10px;margin-bottom:16px}
+.kpi{border:1px solid var(--line);border-radius:8px;padding:10px 12px;background:var(--soft);min-width:0}
+.kpi .l{font-size:10.5px;letter-spacing:.1em;text-transform:uppercase;color:var(--mute);font-weight:600}
+.kpi .v{font:700 30px/1.1 var(--display);font-variant-numeric:tabular-nums}
+.kpi .s{font-size:12px;color:var(--mute)}
+.up{color:var(--good)}.dn{color:var(--bad)}
+h2{font:700 20px/1.1 var(--display);letter-spacing:.03em;text-transform:uppercase;margin:0 0 8px}
+h3{font-size:11px;letter-spacing:.12em;text-transform:uppercase;color:var(--mute);margin:20px 0 8px;font-weight:700}
+.ttl{display:flex;flex-wrap:wrap;gap:6px 14px;align-items:baseline;margin-bottom:12px}
+.ttl .m{color:var(--mute);font-size:13px}
+.chips{display:flex;flex-wrap:wrap;gap:6px}
+.chip{border-radius:999px;padding:2px 10px;font-size:12px;font-weight:600;background:var(--soft);border:1px solid var(--line);font-variant-numeric:tabular-nums}
+.chip.e{background:var(--early-soft);border-color:var(--early)}.chip.r{background:var(--reg-soft);border-color:var(--reg)}
+.scroll{overflow-x:auto;max-width:100%}
+table{border-collapse:collapse;width:100%;font-variant-numeric:tabular-nums}
+th,td{border:1px solid var(--line);padding:5px 8px;text-align:right;white-space:nowrap}
+th{background:var(--brand);color:var(--brand-ink);font-size:11px;letter-spacing:.06em;text-transform:uppercase;font-weight:700}
+th.g{background:var(--soft);color:var(--ink);text-align:center}
+th.click{cursor:pointer}
+td.p,th.p{text-align:left}
+td.p{white-space:normal;min-width:200px}
+tr.z td{color:var(--mute)}
+tr.tot td{font-weight:700;background:var(--reg-soft)}
+td.c{text-align:center;color:var(--mute);min-width:0;width:36px}
+td input{width:100%;min-width:56px;border:1px solid var(--line);border-radius:4px;padding:4px 6px;background:var(--soft);text-align:right}
+td input.t{min-width:88px;text-align:left}
+td input.nt{min-width:160px;text-align:left}
+td.e input{background:var(--early-soft)}
+.tv{font-weight:700}
+.row{display:flex;flex-wrap:wrap;gap:10px 14px;align-items:center;margin:0 0 10px}
+.row label.ck{display:flex;gap:6px;align-items:center;font-size:13px}
+.arr{display:grid;gap:5px;max-width:620px}
+.arr .a{display:grid;grid-template-columns:78px 1fr 40px;gap:8px;align-items:center;font-size:13px}
+.arr .a .bk{height:14px;border-radius:3px;background:var(--reg)}
+.arr .a .t{font-family:var(--mono);font-size:12px}
+.arr .a .n{text-align:right;font-weight:700}
+.empty{color:var(--mute);padding:18px 0}
+.legend{display:flex;gap:14px;font-size:12px;color:var(--mute);margin:0 0 6px}
+.legend i{display:inline-block;width:10px;height:10px;border-radius:2px;margin-right:5px;vertical-align:-1px}
+svg text{fill:var(--mute);font-family:var(--body)}
+svg .val{fill:var(--ink);font-weight:700;font-family:var(--mono)}
+.grid2{display:grid;grid-template-columns:minmax(0,1.5fr) minmax(0,1fr);gap:20px}
+@media (max-width:820px){.grid2{grid-template-columns:minmax(0,1fr)}h1{font-size:28px}}
+#toast{position:fixed;left:50%;transform:translateX(-50%);bottom:calc(20px + env(safe-area-inset-bottom,0px));background:var(--ink);color:var(--bg);padding:9px 16px;border-radius:8px;font-weight:600;z-index:20;max-width:90vw}
+td.p.c{min-width:0;width:36px;text-align:center}
+#vtab input{width:92px;text-align:right;padding:5px 8px;border:1px solid var(--line);border-radius:6px;background:var(--soft);color:var(--ink);font:inherit;font-variant-numeric:tabular-nums}
+#vtab td,#vtab th{text-align:right}#vtab td.p,#vtab th.p{text-align:left}
+.secs{display:flex;gap:8px;margin:0 0 14px;flex-wrap:wrap}
+button.sec{cursor:pointer;padding:10px 18px;border:1px solid var(--line);border-radius:10px;font:700 15px 'Barlow Condensed',sans-serif;letter-spacing:.06em;text-transform:uppercase;text-decoration:none;color:var(--mute);background:var(--soft)}
+button.sec.on{background:var(--brand);color:var(--brand-ink);border-color:transparent}
+details.map{border:1px solid var(--line);border-radius:10px;padding:10px 14px;margin:12px 0;background:var(--soft)}
+details.map summary{cursor:pointer;font-weight:600}
+.maps{display:grid;grid-template-columns:repeat(auto-fill,minmax(170px,1fr));gap:10px;margin:10px 0}
+.maps label{display:flex;flex-direction:column;gap:3px;font-size:11px;text-transform:uppercase;letter-spacing:.06em;color:var(--mute)}
+.maps select{padding:6px;border:1px solid var(--line);border-radius:6px;background:var(--bg);color:var(--ink);font:inherit;text-transform:none;letter-spacing:0}
+.flist{display:flex;flex-wrap:wrap;gap:6px}.chip{border:1px solid var(--line);border-radius:999px;padding:3px 6px 3px 10px;font-size:12px;background:var(--bg)}
+.chip button{border:0;background:none;cursor:pointer;font-size:14px;color:var(--mute)}
+table.rt td,table.rt th{text-align:right}table.rt td.p,table.rt th.p{text-align:left}table.rt small{color:var(--mute)}
+.wgrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(230px,1fr));gap:12px;margin-top:14px}
+.wcard{border:1px solid var(--line);border-radius:10px;background:var(--panel);padding:10px 12px;min-width:0}
+.wh{display:flex;justify-content:space-between;align-items:baseline;border-bottom:2px solid var(--brand);padding-bottom:6px;margin-bottom:6px}
+.wh b{font:700 18px var(--display);letter-spacing:.04em;text-transform:uppercase}.wh span{font:700 26px var(--display);color:var(--brand)}
+.wcard ul{list-style:none;margin:0;padding:0;max-height:340px;overflow:auto}.wcard li{display:flex;justify-content:space-between;gap:8px;padding:3px 0;border-bottom:1px solid var(--line);font-size:13px}
+.wcard li small{color:var(--mute);font-variant-numeric:tabular-nums;white-space:nowrap}
+.wcard.over{outline:2px dashed var(--brand);background:var(--reg-soft)}
+.wcard li{align-items:center;cursor:grab}.wcard li .nm{flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis}
+select.mv{width:74px;padding:2px;border:1px solid var(--line);border-radius:4px;background:var(--soft);color:var(--ink);font-size:11px}
+.wcard li{flex-wrap:wrap}.ex{display:flex;gap:3px;flex-basis:100%}
+.ex .xt{flex:1;min-width:0;padding:2px 4px;border:1px solid var(--line);border-radius:4px;background:var(--soft);color:var(--ink);font-size:12px}
+.ex .xb{padding:2px 10px;font-size:12px}
+
+.sgrid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px;margin:12px 0}
+.sc{border-radius:8px;padding:14px 10px;text-align:center;color:#fff}.sc.t{background:#17c4c4}.sc.b{background:#3a86ff}
+.sc .l{font-size:13px;font-weight:600;letter-spacing:.03em}.sc .v{font-size:34px;font-weight:700;line-height:1.2}
+.schart{display:flex;align-items:flex-end;gap:10px;height:180px;padding:8px 4px 0}
+.sb{flex:1;min-width:0;height:100%;display:flex;flex-direction:column;justify-content:flex-end;align-items:center;gap:4px}
+.sbar{width:70%;background:var(--reg);border-radius:4px 4px 0 0;display:flex;flex-direction:column;justify-content:flex-start;overflow:hidden;min-height:2px}
+.sbv{font-weight:700;font-size:13px}.sbl{font-size:12px;color:var(--mute)}.dot{display:inline-block;width:10px;height:10px;border-radius:2px;margin:0 4px 0 10px}
+</style><div id="app"></div><script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script><script type="application/json" id="state">{"weeks":{"2026-11-02":{"agency":"Lyneer","by":"Leah Li","days":[{"0":{"e1":2,"te1":"7:30 AM"},"1":{"e1":2,"te1":"7:30 AM"},"2":{"e1":1,"te1":"1:00 PM","r1":2,"tr1":"3:00 PM"},"3":{"e1":1,"te1":"2:00 PM","r1":1,"tr1":"3:00 PM"},"9":{"r1":30,"tr1":"3:30 PM"},"10":{"r1":1,"tr1":"3:30 PM"},"11":{"r1":30,"tr1":"3:30 PM"},"12":{"r1":1,"tr1":"3:30 PM"},"13":{"r1":30,"tr1":"3:30 PM"},"14":{"r1":1,"tr1":"3:30 PM"},"24":{"e1":2,"te1":"7:30 AM","r1":2,"tr1":"4:00 PM"},"26":{"e1":3,"te1":"8:00 AM","r1":3,"tr1":"4:00 PM","n":"Carboard Baler & Cleaning, 3 Gaylord Building"}},{"0":{"e1":2,"te1":"7:30 AM"},"1":{"e1":2,"te1":"7:30 AM"},"2":{"e1":1,"te1":"1:00 PM","r1":2,"tr1":"3:00 PM"},"3":{"e1":1,"te1":"2:00 PM","r1":1,"tr1":"3:00 PM"},"9":{"r1":30,"tr1":"7:30 AM"},"10":{"r1":1,"tr1":"7:30 AM"},"11":{"r1":30,"tr1":"3:30 PM"},"12":{"r1":1,"tr1":"3:30 PM"},"13":{"r1":30,"tr1":"3:30 PM"},"14":{"r1":1,"tr1":"3:30 PM"},"15":{"r1":30,"tr1":"3:30 PM"},"16":{"r1":1,"tr1":"3:30 PM"},"24":{"e1":2,"te1":"7:30 AM","r1":2,"tr1":"4:00 PM"},"26":{"e1":3,"te1":"8:00 AM","r1":3,"tr1":"4:00 PM","n":"Carboard Baler & Cleaning, 3 Gaylord Building"}},{"0":{"e1":2,"te1":"7:30 AM"},"1":{"e1":2,"te1":"7:30 AM"},"2":{"e1":1,"te1":"1:00 PM","r1":2,"tr1":"3:00 PM"},"3":{"e1":1,"te1":"2:00 PM","r1":1,"tr1":"3:00 PM"},"9":{"r1":30,"tr1":"7:30 AM"},"10":{"r1":1,"tr1":"7:30 AM"},"11":{"r1":30,"tr1":"3:30 PM"},"12":{"r1":1,"tr1":"3:30 PM"},"13":{"r1":30,"tr1":"3:30 PM"},"14":{"r1":1,"tr1":"3:30 PM"},"15":{"r1":30,"tr1":"3:30 PM"},"16":{"r1":1,"tr1":"3:30 PM"},"24":{"e1":2,"te1":"7:30 AM","r1":2,"tr1":"4:00 PM"},"26":{"e1":3,"te1":"8:00 AM","r1":3,"tr1":"4:00 PM","n":"Carboard Baler & Cleaning, 3 Gaylord Building"}},{"0":{"e1":2,"te1":"7:30 AM"},"1":{"e1":2,"te1":"7:30 AM"},"2":{"e1":1,"te1":"1:00 PM","r1":2,"tr1":"3:00 PM"},"3":{"e1":1,"te1":"2:00 PM","r1":1,"tr1":"3:00 PM"},"9":{"r1":30,"tr1":"7:30 AM"},"10":{"r1":1,"tr1":"7:30 AM"},"11":{"r1":30,"tr1":"3:30 PM"},"12":{"r1":1,"tr1":"3:30 PM"},"13":{"r1":30,"tr1":"3:30 PM"},"14":{"r1":1,"tr1":"3:30 PM"},"15":{"r1":30,"tr1":"3:30 PM"},"16":{"r1":1,"tr1":"3:30 PM"},"24":{"e1":2,"te1":"7:30 AM","r1":2,"tr1":"4:00 PM"},"26":{"e1":3,"te1":"8:00 AM","r1":3,"tr1":"4:00 PM","n":"Carboard Baler & Cleaning, 3 Gaylord Building"}},{"0":{"e1":2,"te1":"7:30 AM"},"1":{"e1":2,"te1":"7:30 AM"},"2":{"e1":1,"te1":"1:00 PM","r1":2,"tr1":"3:00 PM"},"3":{"e1":1,"te1":"2:00 PM","r1":1,"tr1":"3:00 PM"},"9":{"r1":30,"tr1":"7:30 AM"},"10":{"r1":1,"tr1":"7:30 AM"},"11":{"r1":30,"tr1":"3:30 PM"},"12":{"r1":1,"tr1":"3:30 PM"},"13":{"r1":30,"tr1":"3:30 PM"},"14":{"r1":1,"tr1":"3:30 PM"},"15":{"r1":30,"tr1":"3:30 PM"},"16":{"r1":1,"tr1":"3:30 PM"},"24":{"e1":2,"te1":"7:30 AM","r1":2,"tr1":"4:00 PM"},"26":{"e1":3,"te1":"8:00 AM","r1":3,"tr1":"4:00 PM","n":"Carboard Baler & Cleaning, 3 Gaylord Building"}},{"0":{"e1":2,"te1":"7:30 AM"},"1":{"e1":2,"te1":"7:30 AM"},"2":{"e1":1,"te1":"1:00 PM","r1":1,"tr1":"3:00 PM"},"3":{"e1":1,"te1":"2:00 PM","r1":1,"tr1":"3:00 PM"},"9":{"r1":30,"tr1":"7:30 AM"},"10":{"r1":1,"tr1":"7:30 AM"},"11":{"r1":30,"tr1":"3:30 PM"},"12":{"r1":1,"tr1":"3:30 PM"},"13":{"r1":30,"tr1":"3:30 PM"},"14":{"r1":1,"tr1":"3:30 PM"},"24":{"e1":2,"te1":"7:30 AM","r1":2,"tr1":"4:00 PM"},"26":{"e1":3,"te1":"8:00 AM","r1":3,"tr1":"4:00 PM","n":"Carboard Baler & Cleaning, 3 Gaylord Building"}},{"0":{"e1":2,"te1":"7:30 AM"},"1":{"e1":2,"te1":"7:30 AM"},"2":{"e1":1,"te1":"1:00 PM","r1":1,"tr1":"3:00 PM"},"3":{"e1":1,"te1":"2:00 PM","r1":1,"tr1":"3:00 PM"},"9":{"r1":30,"tr1":"3:30 PM"},"10":{"r1":1,"tr1":"3:30 PM"},"11":{"r1":30,"tr1":"3:30 PM"},"12":{"r1":1,"tr1":"3:30 PM"},"24":{"e1":2,"te1":"7:30 AM","r1":2,"tr1":"4:00 PM"},"26":{"e1":3,"te1":"8:00 AM","r1":3,"tr1":"4:00 PM","n":"Carboard Baler & Cleaning, 3 Gaylord Building"}}]},"2026-11-09":{"agency":"Lyneer","by":"Leah Li","days":[{"0":{"e1":2,"te1":"7:30 AM"},"1":{"e1":2,"te1":"7:30 AM"},"2":{"e1":1,"te1":"1:00 PM","r1":2,"tr1":"3:00 PM"},"3":{"e1":1,"te1":"2:00 PM","r1":1,"tr1":"3:00 PM"},"9":{"r1":30,"tr1":"2:00 PM"},"10":{"r1":1,"tr1":"2:00 PM"},"11":{"r1":30,"tr1":"2:00 PM"},"12":{"r1":1,"tr1":"2:00 PM"},"13":{"r1":30,"tr1":"2:00 PM"},"14":{"r1":1,"tr1":"2:00 PM"},"26":{"e1":3,"te1":"8:00 AM","r1":3,"tr1":"2:00 PM","n":"Carboard Baler & Cleaning, 3 Gaylord Building"}},{"0":{"e1":2,"te1":"7:30 AM"},"1":{"e1":2,"te1":"7:30 AM"},"2":{"e1":1,"te1":"1:00 PM","r1":2,"tr1":"3:00 PM"},"3":{"e1":1,"te1":"2:00 PM","r1":1,"tr1":"3:00 PM"},"9":{"r1":30,"tr1":"7:30 AM"},"10":{"r1":1,"tr1":"7:30 AM"},"11":{"r1":30,"tr1":"3:30 PM"},"12":{"r1":1,"tr1":"3:30 PM"},"13":{"r1":30,"tr1":"3:30 PM"},"14":{"r1":1,"tr1":"3:30 PM"},"26":{"e1":3,"te1":"8:00 AM","r1":3,"tr1":"4:00 PM","n":"Carboard Baler & Cleaning, 3 Gaylord Building"}},{"0":{"e1":2,"te1":"7:30 AM"},"1":{"e1":2,"te1":"7:30 AM"},"2":{"e1":1,"te1":"1:00 PM","r1":2,"tr1":"3:00 PM"},"3":{"e1":1,"te1":"2:00 PM","r1":1,"tr1":"3:00 PM"},"9":{"r1":30,"tr1":"7:30 AM"},"10":{"r1":1,"tr1":"7:30 AM"},"11":{"r1":30,"tr1":"3:30 PM"},"12":{"r1":1,"tr1":"3:30 PM"},"13":{"r1":30,"tr1":"3:30 PM"},"14":{"r1":1,"tr1":"3:30 PM"},"26":{"e1":3,"te1":"8:00 AM","r1":3,"tr1":"4:00 PM","n":"Carboard Baler & Cleaning, 3 Gaylord Building"}},{"0":{"e1":2,"te1":"7:30 AM"},"1":{"e1":2,"te1":"7:30 AM"},"2":{"e1":1,"te1":"1:00 PM","r1":2,"tr1":"3:00 PM"},"3":{"e1":1,"te1":"2:00 PM","r1":1,"tr1":"3:00 PM"},"9":{"r1":30,"tr1":"7:30 AM"},"10":{"r1":1,"tr1":"7:30 AM"},"11":{"r1":30,"tr1":"3:30 PM"},"12":{"r1":1,"tr1":"3:30 PM"},"13":{"r1":30,"tr1":"3:30 PM"},"14":{"r1":1,"tr1":"3:30 PM"},"26":{"e1":3,"te1":"8:00 AM","r1":3,"tr1":"4:00 PM","n":"Carboard Baler & Cleaning, 3 Gaylord Building"}},{"0":{"e1":2,"te1":"7:30 AM"},"1":{"e1":2,"te1":"7:30 AM"},"2":{"e1":1,"te1":"1:00 PM","r1":2,"tr1":"3:00 PM"},"3":{"e1":1,"te1":"2:00 PM","r1":1,"tr1":"3:00 PM"},"9":{"r1":30,"tr1":"7:30 AM"},"10":{"r1":1,"tr1":"7:30 AM"},"11":{"r1":30,"tr1":"3:30 PM"},"12":{"r1":1,"tr1":"3:30 PM"},"13":{"r1":30,"tr1":"3:30 PM"},"14":{"r1":1,"tr1":"3:30 PM"},"26":{"e1":3,"te1":"8:00 AM","r1":3,"tr1":"4:00 PM","n":"Carboard Baler & Cleaning, 3 Gaylord Building"}},{"0":{"e1":2,"te1":"7:30 AM"},"1":{"e1":2,"te1":"7:30 AM"},"2":{"e1":1,"te1":"1:00 PM","r1":1,"tr1":"3:00 PM"},"3":{"e1":1,"te1":"2:00 PM","r1":1,"tr1":"3:00 PM"},"9":{"r1":30,"tr1":"7:30 PM"},"10":{"r1":1,"tr1":"7:30 PM"},"11":{"r1":30,"tr1":"3:30 PM"},"12":{"r1":1,"tr1":"3:30 PM"},"26":{"e1":3,"te1":"8:00 AM","r1":3,"tr1":"4:00 PM","n":"Carboard Baler & Cleaning, 3 Gaylord Building"}},{"0":{"e1":2,"te1":"7:30 AM"},"1":{"e1":2,"te1":"7:30 AM"},"2":{"e1":1,"te1":"1:00 PM","r1":1,"tr1":"3:00 PM"},"3":{"e1":1,"te1":"2:00 PM","r1":1,"tr1":"3:00 PM"},"11":{"r1":30,"tr1":"3:30 PM"},"12":{"r1":1,"tr1":"3:30 PM"},"26":{"e1":3,"te1":"8:00 AM","r1":3,"tr1":"4:00 PM","n":"Carboard Baler & Cleaning, 3 Gaylord Building"}}]}}}</script><script id="appjs">const POS=['Outbound Operator (PDA required)','Outbound Forklift Driver','Inbound Forklift Driver','Inbound Operator (PDA required)','Bag Tagging / Supplies Associate','Narrow-Belt Line 1 - Sorter','Narrow-Belt Line 1 - Forklift Driver','Narrow-Belt Line 2 - Sorter','Narrow-Belt Line 2 - Forklift Driver','Manual Sort Conveyor Line 1 - Sorter','Manual Sort Conveyor Line 1 - Forklift Driver','Manual Sort Conveyor Line 2 - Sorter','Manual Sort Conveyor Line 2 - Forklift Driver','Manual Sort Conveyor Line 3 - Sorter','Manual Sort Conveyor Line 3 - Forklift Driver','Manual Sort Conveyor Line 4 - Sorter','Manual Sort Conveyor Line 4 - Forklift Driver','Manual Sort Conveyor Line 5 - Sorter','Manual Sort Conveyor Line 5 - Forklift Driver','Gaylord Extension / Stretch Wrap','Gaylord Extension - Forklift Driver','Cardboard Baler','Cardboard Baler - Forklift Driver','Exception Handling','Gate Traffic Controller / Warehouse Safety','Oversize Package','Other (please specify)'];
+function normTime(v){
+  if(v===''||v==null)return'';
+  let mins=null;
+  if(typeof v==='number'){if(v>=0&&v<1)mins=Math.round(v*1440)%1440;else return String(v)}
+  else{
+    const m=String(v).trim().match(/^(\d{1,2})(?::(\d{2}))?\s*([AaPp])\.?[Mm]?\.?$/);
+    if(m){let h=+m[1]%12;if(m[3].toLowerCase()==='p')h+=12;mins=h*60+(+(m[2]||0))}
+    else{const m2=String(v).trim().match(/^(\d{1,2}):(\d{2})$/);if(m2&&+m2[1]<24)mins=+m2[1]*60+(+m2[2]);else return String(v).trim()}
+  }
+  const h=Math.floor(mins/60),mm=mins%60,ap=h>=12?'PM':'AM',h12=h%12||12;
+  return h12+':'+String(mm).padStart(2,'0')+' '+ap;
+}
+// Start-time groups: 12:00 AM-6:59 AM Opening, 7:00 AM-12:00 PM Early, 12:01 PM-2:00 PM Mid, 2:01 PM+ Regular.
+function tminP(t){const m=String(t||'').match(/^(\d{1,2}):(\d{2}) (AM|PM)$/);return m?(+m[1]%12+(m[3]==='PM'?12:0))*60+ +m[2]:null}
+function splitTimes(row){
+  [1,2].forEach(s=>{
+    const B={o:{hc:0,t:null,tm:1e9},e:{hc:0,t:null,tm:1e9},m:{hc:0,t:null,tm:1e9},r:{hc:0,t:null,tm:1e9}};
+    [['e'+s,'te'+s,'e'],['r'+s,'tr'+s,'r'],['m'+s,'tm'+s,'m']].forEach(([hk,tk,src])=>{
+      const hc=+row[hk]||0;if(!hc)return;
+      const m=tminP(row[tk]),g=m===null?src:(m<420?'o':(m<=720?'e':(m<=840?'m':'r'))),b=B[g];
+      b.hc+=hc;if(m!==null&&m<b.tm){b.tm=m;b.t=row[tk]}
+    });
+    ['o','e','m','r'].forEach(g=>{row[g+s]=B[g].hc||'';row['t'+g+s]=B[g].t||''});
+  });
+  return row;
+}
+function parseWorkbook(XLSX,buf,filename){
+  const wb=XLSX.read(buf,{type:'array'});
+  const aoa=ws=>XLSX.utils.sheet_to_json(ws,{header:1,raw:true,defval:''});
+  const sum=aoa(wb.Sheets[wb.SheetNames[0]]);
+  const dayNames=wb.SheetNames.slice(1);
+  if(dayNames.length<7)throw new Error('Expected a Summary tab plus 7 day tabs (Mon–Sun).');
+  let start=null;
+  const flat=sum.slice(0,6).map(r=>r.join(' ')).join(' ');
+  let m=flat.match(/(\d{1,2})\/(\d{1,2})\/(\d{4})\s*[-–]/);
+  if(!m){const d0=aoa(wb.Sheets[dayNames[0]]);m=String(d0[3]&&d0[3].join(' ')).match(/(\d{1,2})\/(\d{1,2})\/(\d{4})/)}
+  if(!m&&filename){const f=filename.match(/(\d{2})(\d{2})(\d{4})/);if(f)m=[0,f[1],f[2],f[3]]}
+  if(!m)throw new Error('Could not find the week start date.');
+  start=m[3]+'-'+String(m[1]).padStart(2,'0')+'-'+String(m[2]).padStart(2,'0');
+  const cell=(r,c)=>{const x=sum[r]&&sum[r][c];return x==null?'':String(x).trim()};
+  const agency=cell(2,2),by=cell(2,7);
+  const days=[];
+  for(let d=0;d<7;d++){
+    const a=aoa(wb.Sheets[dayNames[d]]),out={};
+    for(let i=0;i<POS.length;i++){
+      const r=a[7+i];if(!r)continue;
+      const n=v=>{const x=parseFloat(v);return isNaN(x)||x===0?'':x};
+      const row={e1:n(r[2]),te1:normTime(r[3]),r1:n(r[4]),tr1:normTime(r[5]),e2:n(r[6]),te2:normTime(r[7]),r2:n(r[8]),tr2:normTime(r[9])};
+      splitTimes(row);
+      let note=String(r[11]||'').trim();
+      if(i===POS.length-1&&!note){const pm=String(r[1]||'').split('\n')[0].match(/[（(]([^）)]+)[）)]/);if(pm)note=pm[1].replace(/，/g,',').trim()}
+      if(note)row.n=note;
+      const hc=(+row.e1||0)+(+row.r1||0)+(+row.e2||0)+(+row.r2||0)+(+row.o1||0)+(+row.m1||0)+(+row.o2||0)+(+row.m2||0);
+      Object.keys(row).forEach(k=>{if(row[k]===''||row[k]==null)delete row[k]});
+      if(hc>0||row.n)out[i]=row;
+    }
+    days.push(out);
+  }
+  return{start,week:{agency,by,days}};
+}
+if(typeof module!=='undefined')module.exports={parseWorkbook,POS,normTime,splitTimes};
+
+const DAYS=['Monday','Tuesday','Wednesday','Thursday','Friday','Saturday','Sunday'],D3=DAYS.map(d=>d.slice(0,3));
+const HK=['o1','e1','m1','r1','o2','e2','m2','r2'];
+let STATE=JSON.parse(document.getElementById('state').textContent||'{}');
+STATE.weeks=STATE.weeks||{};STATE.hours=Object.assign({opening:9,early:9,mid:9,regular:12},STATE.hours||{});
+const U={week:null,tab:'summary',dirty:false,readonly:false,showAll:false,delArm:false,newOpen:false,art:null};
+const $=s=>document.querySelector(s);
+const esc=s=>String(s==null?'':s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+const iso2d=s=>{const [y,m,d]=s.split('-').map(Number);return new Date(y,m-1,d)};
+const d2iso=d=>d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0');
+const addDays=(s,n)=>{const d=iso2d(s);d.setDate(d.getDate()+n);return d2iso(d)};
+const md=s=>{const d=iso2d(s);return String(d.getMonth()+1).padStart(2,'0')+'/'+String(d.getDate()).padStart(2,'0')};
+const mdy=s=>md(s)+'/'+iso2d(s).getFullYear();
+const mondayOf=s=>{const d=iso2d(s);d.setDate(d.getDate()-((d.getDay()+6)%7));return d2iso(d)};
+const num=v=>{const x=parseFloat(v);return isNaN(x)?0:x};
+const fmt=n=>Number.isInteger(n)?String(n):n.toFixed(1);
+const rowHC=r=>r?HK.reduce((s,k)=>s+num(r[k]),0):0;
+const rowEarly=r=>r?num(r.o1)+num(r.e1)+num(r.o2)+num(r.e2):0;
+const rowHrs=r=>r?(num(r.o1)+num(r.o2))*num(STATE.hours.opening)+(num(r.e1)+num(r.e2))*num(STATE.hours.early)+(num(r.m1)+num(r.m2))*num(STATE.hours.mid)+(num(r.r1)+num(r.r2))*num(STATE.hours.regular):0;
+const W=()=>STATE.weeks[U.week];
+const dayHC=(w,d)=>Object.values(w.days[d]||{}).reduce((s,r)=>s+rowHC(r),0);
+const dayEarly=(w,d)=>Object.values(w.days[d]||{}).reduce((s,r)=>s+rowEarly(r),0);
+const dayHrs=(w,d)=>Object.values(w.days[d]||{}).reduce((s,r)=>s+rowHrs(r),0);
+const LINES=[['Narrow-Belt Line 1',[5,6]],['Narrow-Belt Line 2',[7,8]],['Manual Sort Line 1',[9,10]],['Manual Sort Line 2',[11,12]],['Manual Sort Line 3',[13,14]],['Manual Sort Line 4',[15,16]],['Manual Sort Line 5',[17,18]]];
+const fN=n=>n?Math.round(n).toLocaleString('en-US'):'–';
+const fP=n=>n?n.toLocaleString('en-US',{minimumFractionDigits:1,maximumFractionDigits:1}):'–';
+const fH=n=>n?n.toLocaleString('en-US',{maximumFractionDigits:1}):'–';
+function lineHrs(w,d,li,sh){const day=w.days[d]||{};return LINES[li][1].reduce((a,i)=>{const r=day[i]||{};return a+rowHrs(sh===1?{o1:r.o1,e1:r.e1,m1:r.m1,r1:r.r1}:{o2:r.o2,e2:r.e2,m2:r.m2,r2:r.r2})},0)}
+function lineVol(w,d,li,sh){const v=((w.vol||{})[d]||{})[li];return v?num(v['s'+sh]):0}
+const pphOf=(v,h)=>v>0&&h>0?v/h:0;
+function lineCell(w,d,li,sh){const v=lineVol(w,d,li,sh),h=lineHrs(w,d,li,sh);return{v,h,hm:v>0?h:0,vm:h>0?v:0,p:pphOf(v,h)}}
+function dayVol(w,d){
+  const t={v1:0,h1:0,v2:0,h2:0,m1:0,m2:0};
+  LINES.forEach((_,li)=>{[1,2].forEach(sh=>{const c=lineCell(w,d,li,sh);t['v'+sh]+=c.v;t['h'+sh]+=c.hm;t['m'+sh]+=c.vm})});
+  t.v=t.v1+t.v2;t.h=t.h1+t.h2;t.m=t.m1+t.m2;return t;
+}
+function weekVol(w){const t={v:0,h:0,v1:0,h1:0,v2:0,h2:0,m:0,m1:0,m2:0};for(let d=0;d<7;d++){const x=dayVol(w,d);['v','h','v1','h1','v2','h2','m','m1','m2'].forEach(k=>t[k]+=x[k])}return t}
+function volMap(w,d){
+  const m={},t=dayVol(w,d);
+  LINES.forEach((_,li)=>{const a=lineCell(w,d,li,1),b=lineCell(w,d,li,2),v=a.v+b.v,h=a.hm+b.hm,vm=a.vm+b.vm;
+    m['vh1_'+li]=fH(a.h);m['vp1_'+li]=fP(a.p);m['vh2_'+li]=fH(b.h);m['vp2_'+li]=fP(b.p);m['vd_'+li]=fN(v);m['vdh_'+li]=fH(h);m['vdp_'+li]=fP(pphOf(vm,h))});
+  m.tv1=fN(t.v1);m.th1=fH(t.h1);m.tp1=fP(pphOf(t.m1,t.h1));m.tv2=fN(t.v2);m.th2=fH(t.h2);m.tp2=fP(pphOf(t.m2,t.h2));m.tvd=fN(t.v);m.thd=fH(t.h);m.tpd=fP(pphOf(t.m,t.h));
+  return m;
+}
+function volTable(w,d){
+  const m=volMap(w,d);
+  const vis=LINES.map((_,li)=>li).filter(li=>U.showAll||lineHrs(w,d,li,1)+lineHrs(w,d,li,2)>0||lineVol(w,d,li,1)+lineVol(w,d,li,2)>0);
+  if(!vis.length)return'<div class="empty">No line labor on this day, so there is nothing to enter volume against.</div>';
+  const vv=(li,sh)=>{const x=lineVol(w,d,li,sh);return x?x:''};
+  let h=`<div class="scroll"><table id="vtab"><thead><tr><th class="p" rowspan="2">Line</th><th colspan="3">1st shift</th><th colspan="3">2nd shift</th><th colspan="3">Day</th></tr><tr><th>Volume</th><th>Labor hrs</th><th>Avg / hr</th><th>Volume</th><th>Labor hrs</th><th>Avg / hr</th><th>Volume</th><th>Hrs</th><th>Avg / hr</th></tr></thead><tbody>`;
+  vis.forEach(li=>{
+    h+=`<tr><td class="p">${esc(LINES[li][0])}</td><td><input data-v="${li}:1" inputmode="numeric" value="${esc(vv(li,1))}" aria-label="${esc(LINES[li][0])} 1st shift volume"></td><td id="vh1_${li}">${m['vh1_'+li]}</td><td id="vp1_${li}">${m['vp1_'+li]}</td><td><input data-v="${li}:2" inputmode="numeric" value="${esc(vv(li,2))}" aria-label="${esc(LINES[li][0])} 2nd shift volume"></td><td id="vh2_${li}">${m['vh2_'+li]}</td><td id="vp2_${li}">${m['vp2_'+li]}</td><td id="vd_${li}">${m['vd_'+li]}</td><td id="vdh_${li}">${m['vdh_'+li]}</td><td id="vdp_${li}">${m['vdp_'+li]}</td></tr>`;
+  });
+  h+=`<tr class="tot"><td class="p">TOTAL (lines with volume)</td><td id="tv1">${m.tv1}</td><td id="th1">${m.th1}</td><td id="tp1">${m.tp1}</td><td id="tv2">${m.tv2}</td><td id="th2">${m.th2}</td><td id="tp2">${m.tp2}</td><td id="tvd">${m.tvd}</td><td id="thd">${m.thd}</td><td id="tpd">${m.tpd}</td></tr></tbody></table></div>
+  <div class="empty" style="padding:6px 0;font-size:12px">Labor hrs = sorter + forklift headcount on the line × the hours for each start group (opening ${fmt(num(STATE.hours.opening))}, early ${fmt(num(STATE.hours.early))}, regular ${fmt(num(STATE.hours.regular))}). Avg / hr = volume ÷ labor hrs. Totals count hours only for lines where volume is entered.</div>`;
+  return h;
+}
+function volSummary(w){
+  const any=weekVol(w).v>0;
+  let h=`<h3>Line volume and avg per hour</h3>`;
+  if(!any)return h+'<div class="empty">No volume entered yet. Open a day tab and type volume by line and shift.</div>';
+  h+=`<div class="scroll"><table><thead><tr><th class="p">Line</th>${DAYS.map((d,i)=>`<th class="click" data-tab="d${i}">${D3[i]}<br>${md(addDays(U.week,i))}</th>`).join('')}<th>Week vol</th><th>Hrs</th><th>Avg / hr</th></tr></thead><tbody>`;
+  LINES.forEach((L,li)=>{
+    let v=0,hh=0,vm=0;const cells=[0,1,2,3,4,5,6].map(d=>{const a=lineCell(w,d,li,1),b=lineCell(w,d,li,2);v+=a.v+b.v;hh+=a.hm+b.hm;vm+=a.vm+b.vm;return a.v+b.v});
+    if(!v)return;
+    h+=`<tr><td class="p">${esc(L[0])}</td>${cells.map(x=>`<td>${fN(x)}</td>`).join('')}<td>${fN(v)}</td><td>${fH(hh)}</td><td>${fP(pphOf(vm,hh))}</td></tr>`;
+  });
+  const dv=[0,1,2,3,4,5,6].map(d=>dayVol(w,d)),W2=weekVol(w);
+  h+=`<tr class="tot"><td class="p">TOTAL</td>${dv.map(x=>`<td>${fN(x.v)}</td>`).join('')}<td>${fN(W2.v)}</td><td>${fH(W2.h)}</td><td>${fP(pphOf(W2.m,W2.h))}</td></tr></tbody></table></div>`;
+  h+=`<h3>Volume by day and shift</h3><div class="scroll"><table><thead><tr><th class="p" rowspan="2">Day</th><th colspan="3">1st shift</th><th colspan="3">2nd shift</th><th colspan="3">Day total</th></tr><tr><th>Volume</th><th>Hrs</th><th>Avg / hr</th><th>Volume</th><th>Hrs</th><th>Avg / hr</th><th>Volume</th><th>Hrs</th><th>Avg / hr</th></tr></thead><tbody>`;
+  dv.forEach((x,i)=>{if(!x.v)return;h+=`<tr><td class="p click" data-tab="d${i}">${D3[i]} ${md(addDays(U.week,i))}</td><td>${fN(x.v1)}</td><td>${fH(x.h1)}</td><td>${fP(pphOf(x.m1,x.h1))}</td><td>${fN(x.v2)}</td><td>${fH(x.h2)}</td><td>${fP(pphOf(x.m2,x.h2))}</td><td>${fN(x.v)}</td><td>${fH(x.h)}</td><td>${fP(pphOf(x.m,x.h))}</td></tr>`});
+  h+=`<tr class="tot"><td class="p">WEEK</td><td>${fN(W2.v1)}</td><td>${fH(W2.h1)}</td><td>${fP(pphOf(W2.m1,W2.h1))}</td><td>${fN(W2.v2)}</td><td>${fH(W2.h2)}</td><td>${fP(pphOf(W2.m2,W2.h2))}</td><td>${fN(W2.v)}</td><td>${fH(W2.h)}</td><td>${fP(pphOf(W2.m,W2.h))}</td></tr></tbody></table></div>`;
+  return h;
+}
+const weekKeys=()=>Object.keys(STATE.weeks).filter(k=>/^\d{4}-\d{2}-\d{2}$/.test(k)).sort();
+function applyShared(p){const wk=Object.assign({},p.weeks),x=wk._extra||{};delete wk._extra;STATE.weeks=wk;if(!p.dr&&x.dr)STATE.dr=x.dr;if(!p.drMap&&x.drMap)STATE.drMap=x.drMap;if(!p.punchHC&&x.punchHC)STATE.punchHC=x.punchHC}
+const toast=m=>{let t=$('#toast');if(!t){t=document.createElement('div');t.id='toast';document.body.appendChild(t)}t.textContent=m;t.hidden=false;clearTimeout(t._h);t._h=setTimeout(()=>t.hidden=true,4200)};
+const tmin=t=>{const m=String(t).match(/^(\d{1,2}):(\d{2}) (AM|PM)$/);if(!m)return 9999;return (+m[1]%12+(m[3]==='PM'?12:0))*60+ +m[2]};
+const niceScale=max=>{const raw=Math.max(max,1)/4,mag=Math.pow(10,Math.floor(Math.log10(raw))),step=[1,2,2.5,5,10].find(m=>m*mag>=raw)*mag;return{step,top:step*Math.ceil(Math.max(max,1)/step)}};
+
+function pickWeek(){
+  const keys=weekKeys();if(!keys.length){U.week=null;return}
+  if(U.week&&STATE.weeks[U.week])return;
+  const today=d2iso(new Date());
+  U.week=keys.find(k=>today>=k&&today<=addDays(k,6))||keys[keys.length-1];
+}
+function tabList(){return[{k:'summary',t:'SUMMARY',s:'W/O '+md(U.week),n:''}].concat(DAYS.map((_,i)=>({k:'d'+i,t:D3[i].toUpperCase(),s:md(addDays(U.week,i)),n:fmt(dayHC(W(),i))})))}
+
+/* ---------- render ---------- */
+function render(){
+  if(U.sec==='reports')return renderReports();
+  if(U.sec==='attendance')return renderAttendance();
+  if(U.sec==='where')return renderWhere();
+  if(U.sec==='schedule')return renderSchedule();
+  pickWeek();
+  const app=$('#app'),keys=weekKeys();
+  const w=W();
+  let h=`<div class="wrap"><div class="top"><div><div class="eyebrow">LAX Sorting Center · Lyneer</div><h1>Weekly <span>Labor</span> Request</h1></div>
+   <div class="save"><span id="stat" class="stat"></span><button id="btnGs">${SHEET_URL?'Google Sheet ✓':'Google Sheet'}</button><button class="pri" id="btnSave">Save for everyone</button></div></div>
+   ${secNav()}
+   <div class="drop" id="drop" role="button" tabindex="0"><b>Drop weekly request workbook here</b><span>.xlsx · loads or replaces that week · or click this box to choose a file</span><input type="file" id="fi" accept=".xlsx,.xls" multiple hidden></div>`;
+  h+=`<div class="bar"><label>Week of (Mon)<select id="wsel">${keys.map(k=>`<option value="${k}" ${k===U.week?'selected':''}>${mdy(k)} – ${mdy(addDays(k,6))}</option>`).join('')||'<option>No weeks yet</option>'}</select></label>
+   ${w?`<label>Agency<input id="agency" value="${esc(w.agency)}" size="12"></label><label>Requested by<input id="by" value="${esc(w.by)}" size="14"></label>`:''}
+   <div class="sp"></div><button id="btnNew">+ New week</button>${w?`<button id="btnClear" class="danger">${U.clrArm?'Click again to clear week':'Clear week'}</button><button id="btnDel" class="danger">${U.delArm?'Click again to delete week':'Delete week'}</button>`:''}</div>`;
+  if(U.gsOpen){
+    h+=`<div class="bar"><label style="flex:1;min-width:260px">Apps Script web app URL<input id="gsUrl" value="${esc(SHEET_URL)}" placeholder="https://script.google.com/macros/s/.../exec" style="width:100%"></label><button class="pri" id="gsGo">Connect</button>${SHEET_URL?'<button id="gsOff" class="danger">Disconnect</button>':''}<button id="gsCopy">Copy Apps Script</button></div>
+    <div class="drop" style="cursor:default;align-items:flex-start;text-align:left"><b style="font-size:16px">Save to a Google Sheet</b><ol style="margin:6px 0 0;padding-left:18px;line-height:1.7"><li>Create a new Google Sheet.</li><li>Extensions → Apps Script. Delete the sample code, click <b>Copy Apps Script</b> above, paste it, Save.</li><li>Deploy → New deployment → Web app. Execute as <b>Me</b>, Who has access <b>Anyone</b>. Copy the Web app URL.</li><li>Paste the URL above and press Connect. Dropped workbooks and edits then save to the sheet automatically.</li></ol><span>The sheet gets Requests (every position, every day), Daily Summary, and a hidden-style _data tab the page reads. This works from the standalone HTML file (on your computer or Netlify), not inside the claude.ai preview.</span></div>`;
+  }
+  if(U.newOpen){
+    h+=`<div class="bar"><label>Any date in the new week<input type="date" id="newDate"></label>${w?`<label class="ck" style="flex-direction:row;align-items:center;gap:6px;text-transform:none;letter-spacing:0;font-size:13px"><input type="checkbox" id="newCopy" checked> Copy headcounts from ${mdy(U.week)}</label>`:''}<button class="pri" id="btnNewGo">Create week</button><button id="btnNewX">Cancel</button></div>`;
+  }
+  if(!w){h+=`<div class="panel empty" style="border-top:1px solid var(--line);border-radius:10px">No weeks saved yet. Drop a weekly request workbook above, or create a new week.</div></div>`;app.innerHTML=h;wire();updateStat();return}
+  if(!tabList().some(t=>t.k===U.tab))U.tab='summary';
+  h+=`<div class="tabs" role="tablist">${tabList().map(t=>`<div class="tab ${U.tab===t.k?'on':''}" role="tab" tabindex="0" data-tab="${t.k}">${t.t}<small>${t.s}</small>${t.n!==''?`<span class="n" data-tn="${t.k}">${t.n} HC</span>`:''}</div>`).join('')}</div>`;
+  h+=`<div class="panel">${U.tab==='summary'?summaryView():dayView(+U.tab.slice(1))}</div></div>`;
+  app.innerHTML=h;wire();updateStat();
+}
+function weekTotals(w){
+  const per=[0,1,2,3,4,5,6].map(d=>({tot:dayHC(w,d),early:dayEarly(w,d)}));
+  const total=per.reduce((s,x)=>s+x.tot,0);
+  let fk=0,fkIdx=POS.map((p,i)=>/Forklift/.test(p)?i:-1).filter(i=>i>=0);
+  for(let d=0;d<7;d++)fkIdx.forEach(i=>fk+=rowHC((w.days[d]||{})[i]));
+  const hrs=[0,1,2,3,4,5,6].map(d=>dayHrs(w,d));return{per,total,early:per.reduce((s,x)=>s+x.early,0),fk,hrs,hrsTotal:hrs.reduce((a,b)=>a+b,0)};
+}
+function summaryView(){
+  const w=W(),T=weekTotals(w),keys=weekKeys(),pi=keys.indexOf(U.week)-1;
+  let peak=0,pd=0;T.per.forEach((x,i)=>{if(x.tot>peak){peak=x.tot;pd=i}});
+  let delta='';
+  if(pi>=0){const pw=STATE.weeks[keys[pi]],pt=weekTotals(pw).total,df=T.total-pt;delta=`<span class="${df>=0?'up':'dn'}">${df>=0?'▲':'▼'} ${Math.abs(df)}</span> vs week of ${md(keys[pi])}`}
+  const W_V=weekVol(w);
+  const active=T.per.filter(x=>x.tot>0).length;
+  let h=`<div class="ttl"><h2>Week of ${mdy(U.week)} – ${mdy(addDays(U.week,6))}</h2><span class="m">${esc(w.agency||'')}${w.by?' · requested by '+esc(w.by):''}</span></div>
+  <div class="kpis">
+   <div class="kpi"><div class="l">Week total</div><div class="v">${fmt(T.total)}</div><div class="s">${delta||'head-days requested'}</div></div>
+   <div class="kpi"><div class="l">Daily average</div><div class="v">${active?fmt(Math.round(T.total/7*10)/10):0}</div><div class="s">over 7 days</div></div>
+   <div class="kpi"><div class="l">Peak day</div><div class="v">${fmt(peak)}</div><div class="s">${peak?DAYS[pd]+' '+md(addDays(U.week,pd)):'–'}</div></div>
+   <div class="kpi"><div class="l">Early arrivals</div><div class="v">${fmt(T.early)}</div><div class="s">${T.total?Math.round(T.early/T.total*100):0}% of week</div></div>
+   <div class="kpi"><div class="l">Total hours</div><div class="v">${fmt(T.hrsTotal)}</div><div class="s">opening ${fmt(num(STATE.hours.opening))} · early ${fmt(num(STATE.hours.early))} · regular ${fmt(num(STATE.hours.regular))} hrs</div></div>
+   <div class="kpi"><div class="l">Total volume</div><div class="v">${W_V.v?fN(W_V.v):'–'}</div><div class="s">${W_V.v?'line volume entered':'enter on each day tab'}</div></div>
+   <div class="kpi"><div class="l">Overall PPH</div><div class="v">${W_V.v?fP(pphOf(W_V.m,W_V.h)):'–'}</div><div class="s">${W_V.v?fN(W_V.m)+' ÷ '+fH(W_V.h)+' line hrs':'volume ÷ labor hours'}</div></div>
+   <div class="kpi"><div class="l">Forklift drivers</div><div class="v">${fmt(Math.round(T.fk/7*10)/10)}</div><div class="s">avg per day</div></div></div>`;
+  h+=`<div class="grid2"><div><h3>Headcount by day</h3>${chart(T)}</div><div><h3>Peak day start times · ${peak?D3[pd]+' '+md(addDays(U.week,pd)):''}</h3>${arrivals(w,pd)}</div></div>`;
+  h+=`<div class="row" style="margin-top:14px"><label class="ck">Opening hours <input type="text" inputmode="decimal" id="hrsO" value="${esc(STATE.hours.opening)}" style="width:64px;padding:5px 8px;border:1px solid var(--line);border-radius:6px;background:var(--soft)"></label><label class="ck">Early shift hours <input type="text" inputmode="decimal" id="hrsE" value="${esc(STATE.hours.early)}" style="width:64px;padding:5px 8px;border:1px solid var(--line);border-radius:6px;background:var(--soft)"></label><label class="ck">Mid shift hours <input type="text" inputmode="decimal" id="hrsM" value="${esc(STATE.hours.mid)}" style="width:64px;padding:5px 8px;border:1px solid var(--line);border-radius:6px;background:var(--soft)"></label><label class="ck">Regular shift hours <input type="text" inputmode="decimal" id="hrsR" value="${esc(STATE.hours.regular)}" style="width:64px;padding:5px 8px;border:1px solid var(--line);border-radius:6px;background:var(--soft)"></label><span style="color:var(--mute);font-size:12px">Hours = headcount × the hours for its start group. Opening 12 AM–6:59 AM, Early 7 AM–12:59 PM, Regular 1 PM–11:59 PM</span></div>
+  ${volSummary(w)}
+  <h3>Positions by day</h3><div class="row"><label class="ck"><input type="checkbox" id="showAllS" ${U.showAll?'checked':''}> Show all 27 positions</label></div><div class="scroll"><table><thead><tr><th class="p">Position</th>${DAYS.map((d,i)=>`<th class="click" data-tab="d${i}">${D3[i]}<br>${md(addDays(U.week,i))}</th>`).join('')}<th>Week</th><th>Avg</th></tr></thead><tbody>`;
+  POS.forEach((p,i)=>{
+    const v=[0,1,2,3,4,5,6].map(d=>rowHC((w.days[d]||{})[i])),t=v.reduce((a,b)=>a+b,0);
+    if(!t&&!U.showAll)return;
+    h+=`<tr class="${t?'':'z'}"><td class="p">${i+1}. ${esc(p)}</td>${v.map(x=>`<td>${x?fmt(x):'–'}</td>`).join('')}<td class="tv">${t?fmt(t):'–'}</td><td>${t?fmt(Math.round(t/7*10)/10):'–'}</td></tr>`;
+  });
+  h+=`<tr class="tot"><td class="p">TOTAL</td>${T.per.map(x=>`<td>${fmt(x.tot)}</td>`).join('')}<td>${fmt(T.total)}</td><td>${fmt(Math.round(T.total/7*10)/10)}</td></tr><tr class="tot"><td class="p">TOTAL HOURS</td>${T.hrs.map(x=>`<td>${fmt(x)}</td>`).join('')}<td>${fmt(T.hrsTotal)}</td><td>${fmt(Math.round(T.hrsTotal/7))}</td></tr></tbody></table></div>`;
+  return h;
+}
+function chart(T){
+  const max=Math.max(...T.per.map(x=>x.tot)),{step,top}=niceScale(max);
+  const W_=560,H=230,L=36,R=8,TP=18,B=34,iw=W_-L-R,ih=H-TP-B,bw=iw/7;
+  let s=`<div class="legend"><span><i style="background:var(--early)"></i>Early arrivals</span><span><i style="background:var(--reg)"></i>Regular start</span></div><svg viewBox="0 0 ${W_} ${H}" width="100%" role="img" aria-label="Headcount by day">`;
+  for(let v=0;v<=top+1e-9;v+=step){const y=TP+ih-v/top*ih;s+=`<line x1="${L}" x2="${W_-R}" y1="${y}" y2="${y}" stroke="var(--line)"/><text x="${L-6}" y="${y+4}" text-anchor="end" font-size="11">${fmt(v)}</text>`}
+  T.per.forEach((x,i)=>{
+    const reg=x.tot-x.early,bx=L+i*bw+bw*.18,w_=bw*.64,hr=reg/top*ih,he=x.early/top*ih,y0=TP+ih;
+    if(reg>0)s+=`<rect x="${bx}" y="${y0-hr}" width="${w_}" height="${hr}" fill="var(--reg)"/>`;
+    if(x.early>0)s+=`<rect x="${bx}" y="${y0-hr-he}" width="${w_}" height="${he}" fill="var(--early)"/>`;
+    s+=`<text class="val" x="${bx+w_/2}" y="${y0-hr-he-5}" text-anchor="middle" font-size="12">${fmt(x.tot)}</text><text x="${bx+w_/2}" y="${H-16}" text-anchor="middle" font-size="12">${D3[i]}</text><text x="${bx+w_/2}" y="${H-3}" text-anchor="middle" font-size="10">${md(addDays(U.week,i))}</text>`;
+  });
+  return s+'</svg>';
+}
+function arrivalsData(w,d){
+  const m={};
+  Object.values(w.days[d]||{}).forEach(r=>{
+    [['o1','to1'],['e1','te1'],['m1','tm1'],['r1','tr1'],['o2','to2'],['e2','te2'],['m2','tm2'],['r2','tr2']].forEach(([a,t])=>{const n=num(r[a]);if(n>0){const k=r[t]||'No time set';m[k]=(m[k]||0)+n}});
+  });
+  return Object.entries(m).sort((a,b)=>tmin(a[0])-tmin(b[0]));
+}
+function arrivals(w,d){
+  const a=arrivalsData(w,d);if(!a.length)return'<div class="empty">No headcount entered for this day.</div>';
+  const mx=Math.max(...a.map(x=>x[1]));
+  return`<div class="arr" id="arr-${d}">${a.map(([t,n])=>`<div class="a"><span class="t">${esc(t)}</span><span><div class="bk" style="width:${Math.max(3,n/mx*100)}%"></div></span><span class="n">${fmt(n)}</span></div>`).join('')}</div>`;
+}
+function rowHas(r){return r&&(rowHC(r)>0||r.n||HK.some(k=>r[k]!==undefined))}
+function dayView(d){
+  const w=W(),day=w.days[d]=w.days[d]||{},date=addDays(U.week,d);
+  const has2=Object.values(day).some(r=>num(r.e2)||num(r.r2)||num(r.o2)||num(r.m2)||r.te2||r.tr2||r.to2||r.tm2);
+  const hasOM=Object.values(day).some(r=>num(r.o1)||num(r.o2)),hasM=Object.values(day).some(r=>num(r.m1)||num(r.m2));
+  const om=U.showOM===undefined?hasOM:U.showOM;
+  const SC=s=>[...(om?[['o'+s,'to'+s,'Opening']]:[]),['e'+s,'te'+s,'Early'],...((hasM||U.showM)?[['m'+s,'tm'+s,'Mid']]:[]),['r'+s,'tr'+s,'Regular']];
+  const show2=U.show2===undefined?has2:U.show2;
+  const empty=!Object.keys(day).length;
+  const all=U.showAll||empty;
+  let h=`<div class="ttl"><h2>${DAYS[d]} ${mdy(date)}</h2><div class="chips"><span class="chip" id="chTot"></span><span class="chip e" id="chE"></span><span class="chip r" id="chR"></span><span class="chip" id="chH"></span></div></div>
+   <div class="row"><label class="ck"><input type="checkbox" id="showAllD" ${all?'checked':''} ${empty?'disabled':''}> Show all 27 positions</label>
+   <label class="ck"><input type="checkbox" id="show2" ${show2?'checked':''}> 2nd shift columns</label>
+   <label class="ck"><input type="checkbox" id="showOM" ${om?'checked':''}> Opening columns</label>
+   <span style="flex:1"></span><label class="ck">Copy this day to <select id="copyTo"><option value="">choose…</option><option value="wd">Other weekdays</option><option value="we">Weekend</option><option value="all">All other days</option></select></label></div>
+   <div class="scroll"><table id="dtab"><thead><tr><th class="p" rowspan="2">#</th><th class="p" rowspan="2">Position</th><th class="g" colspan="${SC(1).length*2}">1st shift</th>${show2?`<th class="g" colspan="${SC(2).length*2}">2nd shift</th>`:''}<th rowspan="2">Total HC</th><th class="p" rowspan="2">Remarks</th></tr><tr>${SC(1).map(c=>`<th>${c[2]} HC</th><th>${c[2]} start</th>`).join('')}${show2?SC(2).map(c=>`<th>${c[2]} HC</th><th>${c[2]} start</th>`).join(''):''}</tr></thead><tbody>`;
+  POS.forEach((p,i)=>{
+    const r=day[i];if(!all&&!rowHas(r))return;
+    const inp=(k,cls,tc)=>`<td class="${tc||''}"><input class="${cls}" data-i="${i}" data-k="${k}" value="${esc(r&&r[k]!==undefined?r[k]:'')}" ${cls==='t'?'placeholder="h:mm AM"':'inputmode="numeric"'} aria-label="${esc(p)} ${k}"></td>`;
+    h+=`<tr data-row="${i}" class="${rowHC(r)?'':'z'}"><td class="p c">${i+1}</td><td class="p">${esc(p)}</td>${SC(1).map(c=>inp(c[0],'',c[2]==='Regular'?'':' e')+inp(c[1],'t',c[2]==='Regular'?'':' e')).join('')}${show2?SC(2).map(c=>inp(c[0],'',c[2]==='Regular'?'':' e')+inp(c[1],'t',c[2]==='Regular'?'':' e')).join(''):''}<td class="tv" data-rt="${i}">${rowHC(r)?fmt(rowHC(r)):'–'}</td><td class="p"><input class="nt" data-i="${i}" data-k="n" value="${esc(r&&r.n||'')}" aria-label="Remarks for ${esc(p)}"></td></tr>`;
+  });
+  const cols=show2?4:0;
+  h+=`<tr class="tot"><td class="p c"></td><td class="p">TOTAL</td>${SC(1).map(c=>`<td id="f${c[0].toUpperCase()}"></td><td></td>`).join('')}${show2?SC(2).map(c=>`<td id="f${c[0].toUpperCase()}"></td><td></td>`).join(''):''}<td id="fT"></td><td></td></tr></tbody></table></div>
+   <h3>Arrivals by start time</h3><div id="arrBox"></div>
+   ${volSectionDay(w,d)}`;
+  setTimeout(updateDerived,0);
+  return h;
+}
+function volSectionDay(w,d){return `<h3>Line volume and avg per hour</h3>${volTable(w,d)}`}
+function updateDerived(){
+  if(U.tab==='summary')return;const d=+U.tab.slice(1),w=W();if(!w)return;
+  const day=w.days[d]||{},sum=k=>Object.values(day).reduce((s,r)=>s+num(r[k]),0);
+  const tot=dayHC(w,d),e=dayEarly(w,d),set=(id,t)=>{const el=document.getElementById(id);if(el)el.textContent=t};
+  set('chTot',fmt(tot)+' total HC');set('chE',fmt(e)+' early');set('chR',fmt(tot-e)+' regular');set('chH',fmt(dayHrs(w,d))+' hrs');
+  ['o1','e1','m1','r1','o2','e2','m2','r2'].forEach(k=>set('f'+k.toUpperCase(),sum(k)?fmt(sum(k)):'–'));set('fT',fmt(tot));
+  document.querySelectorAll('[data-rt]').forEach(td=>{const r=day[td.dataset.rt],v=rowHC(r);td.textContent=v?fmt(v):'–';td.parentElement.classList.toggle('z',!v)});
+  const vm=volMap(w,d);Object.keys(vm).forEach(k=>set(k,vm[k]));
+  const box=document.getElementById('arrBox');if(box)box.innerHTML=arrivals(w,d);
+  document.querySelectorAll('[data-tn]').forEach(el=>{const k=el.dataset.tn;if(k!=='summary')el.textContent=fmt(dayHC(w,+k.slice(1)))+' HC'});
+}
+function updateStat(){
+  const s=$('#stat'),b=$('#btnSave');if(!s)return;
+  if(U.err){s.textContent=U.err;s.className='stat dirty';b.disabled=false;return}
+  if(SHEET_URL){s.textContent=U.dirty?'Unsaved changes · saving to Google Sheet…':(U.saved?'Saved to Google Sheet · '+hhmm(U.saved):'Connected to Google Sheet');s.className='stat'+(U.dirty?' dirty':'');b.disabled=false;return}
+  if(U.readonly){s.textContent='View only · saving is not available in this view';s.className='stat ro';b.disabled=true;return}
+  s.textContent=U.dirty?'Unsaved changes':(U.saved?'Saved for everyone · '+hhmm(U.saved):'Nothing changed yet · Save still works');s.className='stat'+(U.dirty?' dirty':'');b.disabled=false;
+}
+function markDirty(){U.dirty=true;U.err='';updateStat();if(SHEET_URL){clearTimeout(gsTimer);gsTimer=setTimeout(()=>{if(U.dirty)save()},1500)}}
+
+/* ---------- events ---------- */
+function wire(){
+  const on=(id,ev,fn)=>{const el=document.getElementById(id);if(el)el.addEventListener(ev,fn)};
+  on('btnSave','click',save);
+  on('btnGs','click',()=>{U.gsOpen=!U.gsOpen;render()});
+  on('gsCopy','click',async()=>{try{await navigator.clipboard.writeText(GS_CODE);toast('Apps Script copied. Paste it into the Apps Script editor.')}catch(e){const ta=document.createElement('textarea');ta.value=GS_CODE;document.body.appendChild(ta);ta.select();try{document.execCommand('copy');toast('Apps Script copied.')}catch(x){toast('Copy failed. Use the Copy button in a normal browser tab.')}ta.remove()}});
+  on('gsOff','click',()=>{SHEET_URL='';try{localStorage.removeItem('lax_sheet_url')}catch(e){}U.gsOpen=false;toast('Disconnected from Google Sheets.');render()});
+  on('gsGo','click',async()=>{
+    const u=$('#gsUrl').value.trim();if(!/^https:\/\/script\.google\.com\//.test(u))return toast('Paste the Web app URL that starts with https://script.google.com/');
+    SHEET_URL=u;try{localStorage.setItem('lax_sheet_url',u)}catch(e){}
+    try{const p=await sheetGet();U.gsOpen=false;
+      if(p&&p.weeks&&Object.keys(p.weeks).length){applyShared(p);if(p.hours)STATE.hours=Object.assign(STATE.hours,p.hours);U.saved=p.savedAt;U.dirty=false;toast('Connected. Loaded the weeks already in the sheet.');render()}
+      else{U.saved=0;render();toast('Connected. The sheet is empty, so saving your current weeks to it now.');await save()}
+    }catch(e){SHEET_URL='';try{localStorage.removeItem('lax_sheet_url')}catch(x){}toast('Could not connect: '+e.message)}
+  });on('drop','click',()=>$('#fi').click());on('drop','keydown',e=>{if(e.key==='Enter'||e.key===' '){e.preventDefault();$('#fi').click()}});
+  on('btnClear','click',()=>{
+    if(!U.clrArm){U.clrArm=true;U.delArm=false;return render()}
+    W().days=[{},{},{},{},{},{},{}];U.clrArm=false;markDirty();toast('Cleared all headcounts for the week of '+mdy(U.week)+'. Save for everyone to keep it.');render();
+  });
+  on('fi','change',e=>{loadFiles([...e.target.files]);e.target.value=''});
+  on('wsel','change',e=>{U.week=e.target.value;U.delArm=false;U.clrArm=false;render()});
+  on('agency','input',e=>{W().agency=e.target.value;markDirty()});on('by','input',e=>{W().by=e.target.value;markDirty()});
+  on('btnNew','click',()=>{U.newOpen=true;render()});on('btnNewX','click',()=>{U.newOpen=false;render()});
+  on('btnNewGo','click',()=>{
+    const v=$('#newDate').value;if(!v)return toast('Pick a date first.');
+    const k=mondayOf(v);if(STATE.weeks[k]){U.week=k;U.newOpen=false;return render()}
+    const src=W(),cp=$('#newCopy')&&$('#newCopy').checked;
+    STATE.weeks[k]=cp&&src?JSON.parse(JSON.stringify(src)):{agency:src?src.agency:'Lyneer',by:src?src.by:'',days:[{},{},{},{},{},{},{}]};
+    U.week=k;U.newOpen=false;markDirty();render();
+  });
+  on('btnDel','click',()=>{
+    if(!U.delArm){U.delArm=true;U.clrArm=false;return render()}
+    delete STATE.weeks[U.week];U.week=null;U.delArm=false;markDirty();render();
+  });
+  on('hrsO','change',e=>{STATE.hours.opening=num(e.target.value);markDirty();render()});on('hrsE','change',e=>{STATE.hours.early=num(e.target.value);markDirty();render()});on('hrsM','change',e=>{STATE.hours.mid=num(e.target.value);markDirty();render()});on('hrsR','change',e=>{STATE.hours.regular=num(e.target.value);markDirty();render()});
+  on('showAllS','change',e=>{U.showAll=e.target.checked;render()});
+  on('showAllD','change',e=>{U.showAll=e.target.checked;render()});
+  on('showOM','change',e=>{U.showOM=e.target.checked;render()});on('show2','change',e=>{U.show2=e.target.checked;render()});
+  on('copyTo','change',e=>{
+    const v=e.target.value;if(!v)return;const d=+U.tab.slice(1),w=W();
+    const tg=[0,1,2,3,4,5,6].filter(i=>i!==d&&(v==='all'||(v==='wd'&&i<5)||(v==='we'&&i>=5)));
+    tg.forEach(i=>w.days[i]=JSON.parse(JSON.stringify(w.days[d]||{})));
+    markDirty();toast('Copied '+DAYS[d]+' to '+tg.map(i=>D3[i]).join(', ')+'.');render();
+  });
+  document.querySelectorAll('[data-tab]').forEach(t=>{
+    const go=()=>{U.tab=t.dataset.tab;try{location.hash=U.tab==='summary'?'summary':D3[+U.tab.slice(1)].toLowerCase()}catch(e){}render()};
+    t.addEventListener('click',go);t.addEventListener('keydown',e=>{if(e.key==='Enter'||e.key===' '){e.preventDefault();go()}});
+  });
+  const vt=document.getElementById('vtab');
+  if(vt)vt.addEventListener('input',e=>{const el=e.target;if(!el.dataset.v)return;const [li,sh]=el.dataset.v.split(':'),d=+U.tab.slice(1),w=W();
+    w.vol=w.vol||{};const dd=(w.vol[d]=w.vol[d]||{});const row=(dd[li]=dd[li]||{});const v=String(el.value).replace(/[,\s]/g,'');
+    if(v===''||isNaN(parseFloat(v)))delete row['s'+sh];else row['s'+sh]=parseFloat(v);
+    if(!Object.keys(row).length)delete dd[li];if(!Object.keys(dd).length)delete w.vol[d];markDirty();updateDerived()});
+  const tb=document.getElementById('dtab');
+  if(tb){
+    tb.addEventListener('input',e=>{const el=e.target;if(!el.dataset.k)return;setCell(el.dataset.i,el.dataset.k,el.value);updateDerived()});
+    tb.addEventListener('change',e=>{const el=e.target;if(!el.dataset.k||!/^t/.test(el.dataset.k))return;const v=normTime(el.value);el.value=v;setCell(el.dataset.i,el.dataset.k,v);updateDerived()});
+  }
+}
+function setCell(i,k,v){
+  const d=+U.tab.slice(1),day=W().days[d]=W().days[d]||{};
+  const r=day[i]=day[i]||{};
+  v=String(v).trim();
+  if(v==='')delete r[k];else r[k]=(k==='n'||/^t/.test(k))?v:(isNaN(parseFloat(v))?'':parseFloat(v));
+  if(r[k]==='')delete r[k];
+  if(!Object.keys(r).length)delete day[i];
+  markDirty();
+}
+function hashTab(){const h=location.hash.replace('#','').toLowerCase();U.sec=h==='reports'?'reports':h==='attendance'?'attendance':h==='where'?'where':h==='schedule'?'schedule':'labor';const i=D3.map(x=>x.toLowerCase()).indexOf(h);U.tab=i>=0?'d'+i:'summary'}
+
+/* ---------- load workbooks ---------- */
+async function loadFiles(list){
+  let n=0;
+  for(const f of list){
+    if(!/\.xlsx?$/i.test(f.name)){toast(f.name+' is not an Excel file.');continue}
+    try{
+      const buf=new Uint8Array(await f.arrayBuffer());
+      const {start,week}=parseWorkbook(XLSX,buf,f.name);
+      const had=!!STATE.weeks[start];STATE.weeks[start]=week;U.week=start;n++;
+      toast((had?'Replaced':'Loaded')+' week of '+mdy(start)+'. Review it, then Save for everyone.');
+    }catch(err){toast('Could not read '+f.name+': '+err.message)}
+  }
+  if(n){markDirty();U.tab='summary';render()}
+}
+['dragenter','dragover'].forEach(t=>document.addEventListener(t,e=>{e.preventDefault();const d=$('#drop')||$('#rdrop')||$('#adrop');d&&d.classList.add('over')}));
+document.addEventListener('dragleave',e=>{if(!e.relatedTarget){const d=$('#drop');d&&d.classList.remove('over')}});
+document.addEventListener('drop',e=>{e.preventDefault();const d=$('#drop')||$('#rdrop')||$('#adrop');d&&d.classList.remove('over');(U.sec==='reports'?loadReports:U.sec==='attendance'?loadPunch:U.sec==='where'?(()=>{}):loadFiles)([...e.dataTransfer.files])});
+
+/* ---------- weekly daily reports ---------- */
+const DR_ROLES=[['date','Date'],['shift','Shift'],['line','Line / area'],['hour','Hour of day'],['vol','Volume (pieces)'],['hrs','Labor hours']];
+STATE.dr=STATE.dr||{files:[]};STATE.drMap=STATE.drMap||{};
+const cellStr=v=>{
+  if(v instanceof Date){const d=new Date(+v+30000);const y=d.getFullYear(),hh=String(d.getHours()).padStart(2,'0'),mm=String(d.getMinutes()).padStart(2,'0');
+    return y<1950?hh+':'+mm:d2iso(d)+(d.getHours()||d.getMinutes()?'T'+hh+':'+mm:'')}
+  return v;
+};
+function toIsoDate(v){
+  if(v==null||v==='')return null;
+  if(typeof v==='number'){if(v>30000&&v<80000){const d=new Date(Math.round((v-25569)*864e5));return d.getUTCFullYear()+'-'+String(d.getUTCMonth()+1).padStart(2,'0')+'-'+String(d.getUTCDate()).padStart(2,'0')}return null}
+  const s=String(v).trim();let m;
+  if(m=s.match(/^(\d{4})-(\d{2})-(\d{2})/))return m[1]+'-'+m[2]+'-'+m[3];
+  if(m=s.match(/(\d{1,2})[\/\-.](\d{1,2})[\/\-.](\d{2,4})/)){let y=+m[3];if(y<100)y+=2000;return y+'-'+String(+m[1]).padStart(2,'0')+'-'+String(+m[2]).padStart(2,'0')}
+  if(m=s.match(/(\d{2})(\d{2})(20\d{2})/))return m[3]+'-'+m[1]+'-'+m[2];
+  const t=Date.parse(s);if(!isNaN(t))return d2iso(new Date(t));
+  return null;
+}
+function toHour(v){
+  if(v==null||v==='')return null;
+  if(typeof v==='number'){if(v>=0&&v<1)return Math.floor(v*24+1e-6);if(v>=0&&v<=24)return Math.floor(v);return null}
+  const s=String(v).trim();let m=s.match(/T(\d{1,2}):/)||s.match(/^(\d{1,2}):\d{2}\s*(AM|PM)?/i)||s.match(/^(\d{1,2})\s*(AM|PM)?/i);
+  if(!m)return null;let h=+m[1];const ap=(s.match(/AM|PM/i)||[''])[0].toUpperCase();if(ap==='PM'&&h<12)h+=12;if(ap==='AM'&&h===12)h=0;return h>=0&&h<24?h:null;
+}
+const toShift=v=>{if(v==null||v==='')return 0;const s=String(v).toLowerCase();return /2|second|night|late|pm|b\b/.test(s)?2:1};
+const nnum=v=>{if(typeof v==='number')return v;const x=parseFloat(String(v==null?'':v).replace(/[,\s]/g,''));return isNaN(x)?0:x};
+function parseReport(buf,fname){
+  const wb=XLSX.read(buf,{type:'array',cellDates:true}),out=[];
+  const fg=toIsoDate(fname);
+  wb.SheetNames.forEach(sn=>{
+    const aoa=XLSX.utils.sheet_to_json(wb.Sheets[sn],{header:1,raw:true,defval:null,blankrows:false}).map(r=>r.map(cellStr));
+    let hi=-1;for(let i=0;i<Math.min(aoa.length,40);i++){const r=aoa[i].filter(c=>c!==null&&c!=='');if(r.length>=3&&r.filter(c=>typeof c==='string').length>=r.length*0.6){hi=i;break}}
+    if(hi<0)return;
+    const seen={},headers=aoa[hi].map((c,i)=>{let h=(c==null||c==='')?'Column '+(i+1):String(c).trim();if(seen[h]){seen[h]++;h+=' ('+seen[h]+')'}else seen[h]=1;return h});
+    const data=aoa.slice(hi+1).filter(r=>r.some(c=>c!==null&&c!=='')).slice(0,6000).map(r=>headers.map((_,i)=>r[i]==null?'':r[i]));
+    if(!data.length)return;
+    out.push({file:fname,name:fname+(wb.SheetNames.length>1?' · '+sn:''),fdate:toIsoDate(sn)||fg,headers,data});
+  });
+  return out;
+}
+function autoMap(files){
+  const m=STATE.drMap,used=new Set(Object.values(m));
+  const headers=[...new Set(files.flatMap(f=>f.headers))];
+  const numeric=h=>{let n=0,t=0;files.forEach(f=>{const i=f.headers.indexOf(h);if(i<0)return;f.data.slice(0,60).forEach(r=>{if(r[i]!==''){t++;if(typeof r[i]==='number')n++}})});return t&&n/t>0.6};
+  const rules={date:[/date|^day$/i],shift:[/shift/i],hour:[/^(hour( of day)?|time|interval|period|hr|start time|hour ending)$/i],line:[/line|belt|sort|area|lane|chute|station|zone/i],
+    hrs:[/hours|hrs|labor|man.?h/i],vol:[/volume|pieces|pcs|packages|pkgs|parcels|units|scanned|sorted|processed|throughput|qty|count|total/i]};
+  ['date','shift','hour','line','hrs','vol'].forEach(r=>{
+    if(m[r]&&headers.includes(m[r]))return;delete m[r];
+    const h=headers.find(h=>!used.has(h)&&rules[r].some(x=>x.test(h))&&((r!=='vol'&&r!=='hrs')||numeric(h)));
+    if(h){m[r]=h;used.add(h)}
+  });
+}
+function drRows(){
+  const out=[],m=STATE.drMap;
+  STATE.dr.files.forEach((f,fi)=>{
+    const ix=k=>m[k]?f.headers.indexOf(m[k]):-1,di=ix('date'),si=ix('shift'),li=ix('line'),hi=ix('hour'),vi=ix('vol'),ri=ix('hrs');
+    f.data.forEach(r=>{
+      if(r.some(c=>typeof c==='string'&&/^\s*(grand\s*)?(sub)?totals?\b/i.test(c)))return;
+      const date=(di>=0?toIsoDate(r[di]):null)||f.fdate;if(!date)return;
+      let hr=hi>=0?toHour(r[hi]):null;if(hr===null&&di>=0){const mm=String(r[di]).match(/T(\d{2}):/);if(mm)hr=+mm[1]}
+      out.push({date,wk:mondayOf(date),d:(iso2d(date).getDay()+6)%7,shift:si>=0?toShift(r[si]):0,line:li>=0?String(r[li]||'').trim():'',hour:hr,vol:vi>=0?nnum(r[vi]):0,hrs:ri>=0?nnum(r[ri]):0,fi});
+    });
+  });
+  return out;
+}
+function drWeek(wk,rows){
+  const R=rows.filter(r=>r.wk===wk),w=STATE.weeks[wk],hasHrs=!!STATE.drMap.hrs;
+  const days=[0,1,2,3,4,5,6].map(d=>{
+    const x=R.filter(r=>r.d===d),vol=x.reduce((s,r)=>s+r.vol,0),rh=x.reduce((s,r)=>s+r.hrs,0),plan=w?dayHrs(w,d):0;
+    const hrs=hasHrs&&rh>0?rh:plan,src=hasHrs&&rh>0?'report':(plan?'plan':'');
+    const act=new Set(x.filter(r=>r.hour!==null&&r.vol>0).map(r=>r.hour));
+    return{d,vol,s1:x.filter(r=>r.shift!==2).reduce((s,r)=>s+r.vol,0),s2:x.filter(r=>r.shift===2).reduce((s,r)=>s+r.vol,0),hrs,plan,src,pph:pphOf(vol,hrs),act:act.size,n:x.length};
+  });
+  const vol=days.reduce((s,x)=>s+x.vol,0),hrs=days.reduce((s,x)=>s+(x.vol>0?x.hrs:0),0),act=days.reduce((s,x)=>s+x.act,0);
+  return{R,days,vol,hrs,pph:pphOf(vol,hrs),act,perActive:act?vol/act:0,plan:days.reduce((s,x)=>s+(x.vol>0?x.plan:0),0)};
+}
+function drWeeks(rows){return [...new Set([...rows.map(r=>r.wk),...weekKeys()])].sort()}
+
+function parseDept(buf,fname){
+  const wb=XLSX.read(buf,{type:'array',cellDates:true}),out={},tot={};let n=0;
+  const wkTab=wb.Sheets[wb.SheetNames.find(s=>/week/i.test(s))||''],yr=(()=>{const t=wkTab?JSON.stringify(XLSX.utils.sheet_to_json(wkTab,{header:1,raw:false}).slice(0,4)):'';const m=t.match(/(20\d{2})/)||String(fname).match(/(20\d{2})/);return m?m[1]:String(new Date().getFullYear())})();
+  wb.SheetNames.forEach(sn=>{
+    if(/week|total/i.test(sn))return;
+    const aoa=XLSX.utils.sheet_to_json(wb.Sheets[sn],{header:1,raw:true,defval:null,blankrows:false});
+    const flat=aoa.slice(0,6).map(r=>r.map(c=>c==null?'':String(c)).join(' ')).join(' ');
+    let hi=-1;for(let i=0;i<Math.min(aoa.length,30);i++){const r=aoa[i].map(c=>String(c==null?'':c).replace(/\s+/g,' ').trim().toUpperCase());if(r[0]==='DEPARTMENT'&&r.some(c=>/TOTAL HOURS/.test(c))){hi=i;break}}
+    if(hi<0)return;
+    const H=aoa[hi].map(c=>String(c==null?'':c).replace(/\s+/g,' ').trim().toUpperCase()),ix=re=>H.findIndex(c=>re.test(c));
+    const c={hc:ix(/^ACTIVE/),reg:ix(/^REG/),ot:ix(/^OT/),dt:ix(/^DT/),hrs:ix(/^TOTAL HOURS/),bill:ix(/BILLING/)};
+    let date=null,m=flat.match(/DATE:\s*(\d{1,2})[.\/-](\d{1,2})[.\/-](\d{4})/i);
+    if(m)date=m[3]+'-'+String(+m[1]).padStart(2,'0')+'-'+String(+m[2]).padStart(2,'0');
+    else if(m=sn.match(/(\d{1,2})[.\/-](\d{1,2})/))date=yr+'-'+String(+m[1]).padStart(2,'0')+'-'+String(+m[2]).padStart(2,'0');
+    if(!date)return;
+    const v=(r,i)=>i>=0&&typeof r[i]==='number'?r[i]:0,day={};
+    for(let i=hi+1;i<aoa.length;i++){const r=aoa[i],d=String(r[0]==null?'':r[0]).trim();if(/^totals?/i.test(d)){tot[date]=v(r,c.hc);break}if(!d||/^notes?/i.test(d))break;
+      const x=day[d]||(day[d]={hc:0,reg:0,ot:0,dt:0,hrs:0,bill:0});x.hc+=v(r,c.hc);x.reg+=v(r,c.reg);x.ot+=v(r,c.ot);x.dt+=v(r,c.dt);x.hrs+=v(r,c.hrs);x.bill+=v(r,c.bill)}
+    if(Object.keys(day).length){out[date]=day;n++}
+  });
+  return {days:out,tot,n};
+}
+function deptView(){
+  const D=STATE.dr.dept||{},dates=Object.keys(D).sort();if(!dates.length)return '';
+  const weeks=[...new Set(dates.map(mondayOf))].sort();if(!U.dweek||!weeks.includes(U.dweek))U.dweek=weeks[weeks.length-1];
+  const wk=U.dweek,days=[0,1,2,3,4,5,6].map(d=>D[addDays(wk,d)]),depts=[...new Set(days.filter(Boolean).flatMap(x=>Object.keys(x)))];
+  const S=(dp,k)=>days.reduce((s,x)=>s+(x&&x[dp]?x[dp][k]:0),0),nd=days.filter(Boolean).length;
+  const money=n=>n?'$'+n.toLocaleString('en-US',{minimumFractionDigits:2,maximumFractionDigits:2}):'–';
+  const tc=d=>{const t=(STATE.dr.deptTot||{})[addDays(wk,d)],x=days[d];return t!=null?t:(x?Object.values(x).reduce((s,y)=>s+y.hc,0):0)};
+  const tk=k=>depts.reduce((s,dp)=>s+S(dp,k),0);
+  let h=`<div class="panel"><div class="ttl"><h2>Department totals</h2><span class="m">from the daily reports · ${nd} day${nd===1?'':'s'}</span></div>
+   <div class="row"><label class="ck">Week of <select id="dsel">${weeks.map(k=>`<option value="${k}" ${k===wk?'selected':''}>${mdy(k)} – ${mdy(addDays(wk===k?k:k,6))}</option>`).join('')}</select></label><div class="sp"></div><button id="dClear" class="danger">${U.dclr?'Sure? Click again':'Clear this week'}</button></div>
+   <div class="scroll"><table class="rt"><thead><tr><th class="p">Department</th><th>Avg HC / day</th><th>Reg hrs</th><th>OT hrs</th><th>DT hrs</th><th>Total hrs</th><th>Billing</th></tr></thead><tbody>
+   ${depts.map(dp=>`<tr><td class="p">${esc(dp)}</td><td>${fH(S(dp,'hc')/Math.max(1,days.filter(x=>x&&x[dp]).length))}</td><td>${fH(S(dp,'reg'))}</td><td>${fH(S(dp,'ot'))}</td><td>${fH(S(dp,'dt'))}</td><td><b>${fH(S(dp,'hrs'))}</b></td><td>${money(S(dp,'bill'))}</td></tr>`).join('')}
+   <tr class="tot"><td class="p">TOTAL</td><td>${fH([0,1,2,3,4,5,6].reduce((s,d)=>s+tc(d),0)/Math.max(1,nd))}</td><td>${fH(tk('reg'))}</td><td>${fH(tk('ot'))}</td><td>${fH(tk('dt'))}</td><td>${fH(tk('hrs'))}</td><td>${money(tk('bill'))}</td></tr></tbody></table></div>
+   <h3>Total hours by day</h3><div class="scroll"><table class="rt"><thead><tr><th class="p">Department</th>${DAYS.map((d,i)=>`<th>${D3[i]}<br>${md(addDays(wk,i))}</th>`).join('')}<th>Week</th></tr></thead><tbody>
+   ${depts.map(dp=>`<tr><td class="p">${esc(dp)}</td>${days.map(x=>`<td>${x&&x[dp]?fH(x[dp].hrs):'–'}</td>`).join('')}<td><b>${fH(S(dp,'hrs'))}</b></td></tr>`).join('')}
+   <tr class="tot"><td class="p">TOTAL</td>${days.map(x=>`<td>${x?fH(Object.values(x).reduce((s,y)=>s+y.hrs,0)):'–'}</td>`).join('')}<td>${fH(tk('hrs'))}</td></tr></tbody></table></div>
+   <h3>Headcount by day</h3><div class="scroll"><table class="rt"><thead><tr><th class="p">Department</th>${DAYS.map((d,i)=>`<th>${D3[i]}<br>${md(addDays(wk,i))}</th>`).join('')}</tr></thead><tbody>
+   ${depts.map(dp=>`<tr><td class="p">${esc(dp)}</td>${days.map(x=>`<td>${x&&x[dp]?fH(x[dp].hc):'–'}</td>`).join('')}</tr>`).join('')}
+   <tr class="tot"><td class="p">TOTAL</td>${days.map((x,i)=>`<td>${x?fH(tc(i)):'–'}</td>`).join('')}</tr></tbody></table></div></div>`;
+  return h;
+}
+function reportsView(){
+  const files=STATE.dr.files,rows=drRows(),weeks=drWeeks(rows),m=STATE.drMap;
+  if(!U.rweek||!weeks.includes(U.rweek))U.rweek=rows.length?[...new Set(rows.map(r=>r.wk))].sort().pop():(weeks[weeks.length-1]||'');
+  const wk=U.rweek;
+  let h=`<div class="drop" id="rdrop" role="button" tabindex="0"><b>Drop the daily reports here</b><span>.xlsx · drop all of the week's daily reports at once · click to choose files</span><input type="file" id="rfi" accept=".xlsx,.xls,.csv" multiple hidden></div>`;
+  h+=deptView();
+  if(!files.length)return h+`<div class="panel empty" style="border-top:1px solid var(--line);border-radius:10px">No daily reports loaded yet. Drop the Excel reports above. The tool reads the first table in each sheet and guesses which columns are date, shift, line, hour, volume and labor hours. You can correct the guess.</div>`;
+  const hdrs=[...new Set(files.flatMap(f=>f.headers))];
+  h+=`<div class="bar"><label>Week of (Mon)<select id="rsel">${weeks.map(k=>`<option value="${k}" ${k===wk?'selected':''}>${mdy(k)} – ${mdy(addDays(k,6))}</option>`).join('')}</select></label><div class="sp"></div><button id="rClear" class="danger">${U.rclrArm?'Click again to remove all reports':'Remove all reports'}</button></div>`;
+  h+=`<details class="map" ${DR_ROLES.some(([k])=>!m[k]&&(k==='vol'||k==='date'))?'open':''}><summary>Column mapping · ${files.length} file${files.length>1?'s':''} loaded</summary><div class="maps">${DR_ROLES.map(([k,l])=>`<label>${l}<select data-map="${k}"><option value="">(none)</option>${hdrs.map(x=>`<option ${m[k]===x?'selected':''}>${esc(x)}</option>`).join('')}</select></label>`).join('')}</div>
+  <div class="flist">${files.map((f,i)=>`<span class="chip">${esc(f.name)} · ${f.data.length} rows${f.fdate?'':' · no date found'} <button data-dl="${i}" title="Download the Excel file">⬇ Excel</button><button data-rm="${i}" title="Remove">×</button></span>`).join('')}</div>
+  <div class="empty" style="padding:4px 0;font-size:12px">Date is taken from the Date column, or from the file or sheet name when there is none. If Labor hours is (none), hours come from the Weekly Labor Request for that day.</div></details>`;
+  if(!m.vol)return h+`<div class="panel empty" style="border-top:1px solid var(--line);border-radius:10px">Pick the Volume column above so the totals can be calculated.</div>`;
+  const T=drWeek(wk,rows);
+  if(!T.R.length)return h+`<div class="panel empty" style="border-top:1px solid var(--line);border-radius:10px">No report rows fall in the week of ${mdy(wk)}. Pick another week, or check the Date column mapping.</div>`;
+  const hasH=!!m.hrs&&T.days.some(x=>x.src==='report'),hasHr=T.R.some(r=>r.hour!==null);
+  h+=`<div class="panel"><div class="ttl"><h2>Week of ${mdy(wk)} – ${mdy(addDays(wk,6))}</h2><span class="m">daily reports</span></div><div class="kpis">
+   <div class="kpi"><div class="l">Weekly volume</div><div class="v">${fN(T.vol)}</div><div class="s">${T.days.filter(x=>x.vol>0).length} days reported</div></div>
+   <div class="kpi"><div class="l">Weekly PPH</div><div class="v">${fP(T.pph)}</div><div class="s">${fN(T.vol)} ÷ ${fH(T.hrs)} ${hasH?'report':'planned'} hrs</div></div>
+   <div class="kpi"><div class="l">Avg per hour</div><div class="v">${hasHr?fN(T.perActive):fP(T.pph)}</div><div class="s">${hasHr?'per active hour · '+T.act+' hrs with volume':'volume ÷ labor hours'}</div></div>
+   <div class="kpi"><div class="l">Labor hrs plan</div><div class="v">${fH(T.plan)}</div><div class="s">from the weekly labor request</div></div></div>`;
+  h+=`<h3>By day</h3><div class="scroll"><table class="rt"><thead><tr><th class="p">Day</th><th>Volume</th><th>1st shift</th><th>2nd shift</th><th>Labor hrs</th><th>PPH</th>${hasHr?'<th>Active hrs</th><th>Avg / active hr</th>':''}<th>Plan hrs</th><th>Hrs vs plan</th></tr></thead><tbody>`;
+  T.days.forEach(x=>{if(!x.n)return;h+=`<tr><td class="p">${D3[x.d]} ${md(addDays(wk,x.d))}</td><td>${fN(x.vol)}</td><td>${fN(x.s1)}</td><td>${fN(x.s2)}</td><td>${fH(x.hrs)}${x.src==='plan'?' <small>plan</small>':''}</td><td>${fP(x.pph)}</td>${hasHr?`<td>${x.act||'–'}</td><td>${x.act?fN(x.vol/x.act):'–'}</td>`:''}<td>${fH(x.plan)}</td><td>${x.plan&&x.src==='report'?(x.hrs-x.plan>0?'+':'')+fH(x.hrs-x.plan):'–'}</td></tr>`});
+  const s1=T.days.reduce((s,x)=>s+x.s1,0),s2=T.days.reduce((s,x)=>s+x.s2,0);
+  h+=`<tr class="tot"><td class="p">WEEK</td><td>${fN(T.vol)}</td><td>${fN(s1)}</td><td>${fN(s2)}</td><td>${fH(T.hrs)}</td><td>${fP(T.pph)}</td>${hasHr?`<td>${T.act||'–'}</td><td>${T.act?fN(T.perActive):'–'}</td>`:''}<td>${fH(T.plan)}</td><td></td></tr></tbody></table></div>`;
+  if(m.line){
+    const ls=[...new Set(T.R.filter(r=>r.vol>0).map(r=>r.line||'(blank)'))].sort((a,b)=>a.localeCompare(b,undefined,{numeric:true}));
+    h+=`<h3>By line</h3><div class="scroll"><table class="rt"><thead><tr><th class="p">Line</th>${DAYS.map((d,i)=>`<th>${D3[i]}<br>${md(addDays(wk,i))}</th>`).join('')}<th>Week</th>${m.hrs?'<th>Hrs</th><th>PPH</th>':''}</tr></thead><tbody>`;
+    ls.forEach(L=>{const x=T.R.filter(r=>(r.line||'(blank)')===L),cells=[0,1,2,3,4,5,6].map(d=>x.filter(r=>r.d===d).reduce((s,r)=>s+r.vol,0)),v=cells.reduce((a,b)=>a+b,0),hh=x.reduce((s,r)=>s+r.hrs,0);
+      h+=`<tr><td class="p">${esc(L)}</td>${cells.map(c=>`<td>${fN(c)}</td>`).join('')}<td>${fN(v)}</td>${m.hrs?`<td>${fH(hh)}</td><td>${fP(pphOf(v,hh))}</td>`:''}</tr>`});
+    h+=`<tr class="tot"><td class="p">TOTAL</td>${T.days.map(x=>`<td>${fN(x.vol)}</td>`).join('')}<td>${fN(T.vol)}</td>${m.hrs?`<td>${fH(T.R.reduce((s,r)=>s+r.hrs,0))}</td><td>${fP(pphOf(T.vol,T.R.reduce((s,r)=>s+r.hrs,0)))}</td>`:''}</tr></tbody></table></div>`;
+  }
+  if(hasHr){
+    const hrsL=[...new Set(T.R.filter(r=>r.hour!==null&&r.vol>0).map(r=>r.hour))].sort((a,b)=>a-b);
+    const lab=n=>(n%12||12)+(n<12?' AM':' PM');
+    h+=`<h3>Hour over hour</h3><div class="scroll"><table class="rt"><thead><tr><th class="p">Hour</th>${DAYS.map((d,i)=>`<th>${D3[i]}<br>${md(addDays(wk,i))}</th>`).join('')}<th>Total</th><th>Avg / day</th></tr></thead><tbody>`;
+    hrsL.forEach(hr=>{const cells=[0,1,2,3,4,5,6].map(d=>T.R.filter(r=>r.d===d&&r.hour===hr).reduce((s,r)=>s+r.vol,0)),v=cells.reduce((a,b)=>a+b,0),n=cells.filter(c=>c>0).length;
+      h+=`<tr><td class="p">${lab(hr)}</td>${cells.map(c=>`<td>${fN(c)}</td>`).join('')}<td>${fN(v)}</td><td>${n?fN(v/n):'–'}</td></tr>`});
+    h+=`<tr class="tot"><td class="p">TOTAL</td>${T.days.map(x=>`<td>${fN(x.vol)}</td>`).join('')}<td>${fN(T.vol)}</td><td></td></tr></tbody></table></div>`;
+  }
+  const rw=[...new Set(rows.map(r=>r.wk))].sort();
+  if(rw.length>1){
+    h+=`<h3>Week over week</h3><div class="scroll"><table class="rt"><thead><tr><th class="p">Week of</th><th>Volume</th><th>Labor hrs</th><th>PPH</th></tr></thead><tbody>`;
+    rw.forEach(k=>{const t=drWeek(k,rows);h+=`<tr><td class="p">${mdy(k)}</td><td>${fN(t.vol)}</td><td>${fH(t.hrs)}</td><td>${fP(t.pph)}</td></tr>`});
+    h+=`</tbody></table></div>`;
+  }
+  return h+`</div>`;
+}
+async function loadReports(list){
+  let n=0,dn=0;
+  for(const f of list){
+    if(!/\.(xlsx?|csv)$/i.test(f.name)){toast(f.name+' is not an Excel file.');continue}
+    try{
+      const dp=parseDept(new Uint8Array(await f.arrayBuffer()),f.name);
+      if(dp.n){STATE.dr.dept=STATE.dr.dept||{};Object.assign(STATE.dr.dept,dp.days);STATE.dr.deptTot=Object.assign(STATE.dr.deptTot||{},dp.tot);dn+=dp.n;
+        STATE.dr.blobs=STATE.dr.blobs||{};const u=new Uint8Array(await f.arrayBuffer());if(u.length<1500000){let b='';for(let q=0;q<u.length;q+=0x8000)b+=String.fromCharCode.apply(null,u.subarray(q,q+0x8000));STATE.dr.blobs[f.name]=btoa(b)}
+        STATE.dr.dfiles=[...new Set([...(STATE.dr.dfiles||[]),f.name])];continue}
+      const tabs=parseReport(new Uint8Array(await f.arrayBuffer()),f.name);
+      if(!tabs.length){toast('No table found in '+f.name);continue}
+      STATE.dr.files=STATE.dr.files.filter(x=>!tabs.some(t=>t.name===x.name));
+      tabs.forEach(t=>STATE.dr.files.push(t));n+=tabs.length;
+      STATE.dr.blobs=STATE.dr.blobs||{};const u8=new Uint8Array(await f.arrayBuffer());
+      if(u8.length<1500000){let b='';for(let i=0;i<u8.length;i+=0x8000)b+=String.fromCharCode.apply(null,u8.subarray(i,i+0x8000));STATE.dr.blobs[f.name]=btoa(b)}
+    }catch(err){toast('Could not read '+f.name+': '+err.message)}
+  }
+  if(dn){U.dweek=null;markDirty();toast('Saved department totals for '+dn+' day'+(dn>1?'s':'')+'. Hit Save for everyone to keep them.');render()}
+  if(n){autoMap(STATE.dr.files);U.rweek=null;markDirty();toast('Loaded '+n+' daily report'+(n>1?'s':'')+'. Check the column mapping, then Save for everyone.');render()}
+}
+function downloadReport(f){
+  let blob,name=(f.file||f.name).replace(/[\\/:*?"<>|]/g,'_');
+  const b64=(STATE.dr.blobs||{})[f.file||f.name];
+  if(b64){const bin=atob(b64),u8=new Uint8Array(bin.length);for(let i=0;i<bin.length;i++)u8[i]=bin.charCodeAt(i);blob=new Blob([u8],{type:'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'})}
+  else{const wb=XLSX.utils.book_new();XLSX.utils.book_append_sheet(wb,XLSX.utils.aoa_to_sheet([f.headers,...f.data]),'Report');blob=new Blob([XLSX.write(wb,{type:'array',bookType:'xlsx'})],{type:'application/octet-stream'});if(!/\.xlsx$/i.test(name))name+='.xlsx'}
+  const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download=name;document.body.appendChild(a);a.click();a.remove();setTimeout(()=>URL.revokeObjectURL(a.href),2000);
+  toast('Downloading '+name+'. If nothing happens, the page is in a preview that blocks downloads: open the file in your browser.');
+}
+function wireReports(){
+  const on=(id,ev,fn)=>{const el=document.getElementById(id);if(el)el.addEventListener(ev,fn)};
+  on('rdrop','click',()=>$('#rfi').click());on('rdrop','keydown',e=>{if(e.key==='Enter'||e.key===' '){e.preventDefault();$('#rfi').click()}});
+  on('rfi','change',e=>{loadReports([...e.target.files]);e.target.value=''});
+  document.querySelectorAll('[data-fday]').forEach(b=>b.addEventListener('click',()=>{U.fday=+b.dataset.fday;render()}));on('rsel','change',e=>{U.rweek=e.target.value;render()});on('dsel','change',e=>{U.dweek=e.target.value;render()});
+  on('dClear','click',()=>{if(!U.dclr){U.dclr=true;render();setTimeout(()=>{U.dclr=false;if(U.sec==='reports')render()},4000);return}U.dclr=false;for(let d=0;d<7;d++)delete (STATE.dr.dept||{})[addDays(U.dweek,d)];markDirty();render()});
+  on('rClear','click',()=>{if(!U.rclrArm){U.rclrArm=true;render();setTimeout(()=>{U.rclrArm=false;render()},4000);return}U.rclrArm=false;STATE.dr.files=[];STATE.dr.blobs={};markDirty();render()});
+  document.querySelectorAll('[data-map]').forEach(s=>s.addEventListener('change',()=>{if(s.value)STATE.drMap[s.dataset.map]=s.value;else delete STATE.drMap[s.dataset.map];markDirty();render()}));
+  document.querySelectorAll('[data-dl]').forEach(b=>b.addEventListener('click',()=>downloadReport(STATE.dr.files[+b.dataset.dl])));
+  document.querySelectorAll('[data-rm]').forEach(b=>b.addEventListener('click',()=>{const g=STATE.dr.files.splice(+b.dataset.rm,1)[0];if(g&&STATE.dr.blobs&&!STATE.dr.files.some(x=>x.file===g.file))delete STATE.dr.blobs[g.file];markDirty();render()}));
+}
+
+function secNav(){return `<div class="secs" role="tablist"><button type="button" class="sec ${['reports','attendance','where','schedule'].includes(U.sec)?'':'on'}" data-sec="labor">Weekly Labor Request</button><button type="button" class="sec ${U.sec==='attendance'?'on':''}" data-sec="attendance">Attendance Points</button><button type="button" class="sec ${U.sec==='schedule'?'on':''}" data-sec="schedule">Schedule</button><button type="button" class="sec ${U.sec==='reports'?'on':''}" data-sec="reports">Weekly Daily Reports</button><button type="button" class="sec ${U.sec==='where'?'on':''}" data-sec="where">Who's Where</button></div>`}
+document.addEventListener('click',e=>{const b=e.target.closest&&e.target.closest('[data-sec]');if(!b)return;U.sec=b.dataset.sec;try{location.hash=U.sec==='reports'?'reports':U.sec==='attendance'?'attendance':U.sec==='where'?'where':U.sec==='schedule'?'schedule':(U.tab==='summary'?'summary':D3[+U.tab.slice(1)].toLowerCase())}catch(err){}render()});
+function markDirtyHC(nd){if(nd&&typeof markDirty==='function'){try{markDirty()}catch(e){}}}
+function renderReports(){
+  const app=$('#app');
+  app.innerHTML=`<div class="wrap"><div class="top"><div><div class="eyebrow">LAX Sorting Center · Lyneer</div><h1>Weekly <span>Daily</span> Reports</h1></div>
+   <div class="save"><span id="stat" class="stat"></span><button id="btnGs">${SHEET_URL?'Google Sheet ✓':'Google Sheet'}</button><button class="pri" id="btnSave">Save for everyone</button></div></div>${secNav()}${U.gsOpen?'<div class="bar"><span class="empty">Open the Weekly Labor Request section to set up the Google Sheet connection.</span></div>':''}${reportsView()}${hcSection()}</div>`;
+  wire();wireReports();updateStat();const on2=(id,fn)=>{const el=document.getElementById(id);if(el)el.addEventListener('change',fn)};on2('hsel',e=>{U.hcweek=e.target.value;render()});on2('hmode',e=>{U.hcMode=e.target.value;render()});
+}
+/* ---------- attendance points ---------- */
+const ATT_GS="// Attendance Points ledger. Paste into a NEW Google Sheet: Extensions > Apps Script, then Deploy > New deployment > Web app\n// (Execute as: Me, Who has access: Anyone). Copy the /exec URL into the Attendance Points tab.\nvar SH = 'Infractions', TOT = 'Totals';\nvar HEAD = ['Name', 'Date', 'In punch', 'Out punch', 'Late (min)', 'Early (min)', 'Late point', 'Early point', 'Points'];\nfunction sheet_(name) {\n  var ss = SpreadsheetApp.getActiveSpreadsheet(), s = ss.getSheetByName(name);\n  if (!s) s = ss.insertSheet(name);\n  return s;\n}\nfunction readAll_() {\n  var s = sheet_(SH), v = s.getDataRange().getValues(), out = [];\n  for (var i = 1; i \u003c v.length; i++) {\n    if (!v[i][0]) continue;\n    out.push({ name: String(v[i][0]), date: String(v[i][1]).slice(0, 10), inn: String(v[i][2]), out: String(v[i][3]), late: Number(v[i][4]) || 0, early: Number(v[i][5]) || 0, pts: Number(v[i][8]) || 0 });\n  }\n  return out;\n}\nfunction json_(o) { return ContentService.createTextOutput(JSON.stringify(o)).setMimeType(ContentService.MimeType.JSON); }\nfunction doGet(e) { return json_({ ok: true, records: readAll_() }); }\nfunction doPost(e) {\n  var lock = LockService.getScriptLock(); lock.waitLock(30000);\n  try {\n    var b = JSON.parse(e.postData.contents), keys = {}, i;\n    (b.keys || []).forEach(function (k) { keys[k] = 1; });\n    var keep = readAll_().filter(function (r) { return !keys[r.name.toLowerCase() + '|' + r.date]; });\n    (b.records || []).forEach(function (r) { keep.push(r); });\n    keep.sort(function (a, c) { return a.date \u003c c.date ? -1 : a.date > c.date ? 1 : a.name.localeCompare(c.name); });\n    var s = sheet_(SH); s.clear();\n    var rows = [HEAD].concat(keep.map(function (r) { return [r.name, r.date, r.inn, r.out, r.late, r.early, r.late > 0 ? 1 : 0, r.early > 0 ? 1 : 0, r.pts]; }));\n    s.getRange(1, 1, rows.length, HEAD.length).setNumberFormat('@').setValues(rows);\n    s.getRange(2, 5, Math.max(rows.length - 1, 1), 5).setNumberFormat('0');\n    s.getRange(1, 1, 1, HEAD.length).setFontWeight('bold'); s.setFrozenRows(1);\n    var t = {};\n    keep.forEach(function (r) { var k = r.name.toLowerCase(); var x = t[k] || (t[k] = { n: r.name, p: 0, l: 0, e: 0, a: 0, lm: 0, em: 0, d: '' }); if (r.inn === 'ABSENT') x.a++; x.p += r.pts; x.lm += r.late; x.em += r.early; if (r.late > 0) x.l++; if (r.early > 0) x.e++; if (r.date > x.d) x.d = r.date; });\n    var tr = [['Name', 'Total points', 'Late days', 'Early-out days', 'Absences', 'Total min late', 'Total min left early', 'Last infraction']];\n    Object.keys(t).map(function (k) { return t[k]; }).sort(function (a, c) { return c.p - a.p || a.n.localeCompare(c.n); }).forEach(function (x) { tr.push([x.n, x.p, x.l, x.e, x.a, x.lm, x.em, x.d]); });\n    var ts = sheet_(TOT); ts.clear(); ts.getRange(1, 1, tr.length, 8).setNumberFormat('@').setValues(tr);\n    ts.getRange(2, 2, Math.max(tr.length - 1, 1), 6).setNumberFormat('0'); ts.getRange(1, 1, 1, 8).setFontWeight('bold'); ts.setFrozenRows(1);\n    return json_({ ok: true, count: keep.length });\n  } catch (err) { return json_({ ok: false, error: String(err) }); }\n  finally { lock.releaseLock(); }\n}\n";
+const AR=[['name','Name'],['name2','Last name (if separate)'],['date','Date'],['in','Clock in'],['out','Clock out']];
+U.att={files:[],map:{},recs:[],all:false,q:'',status:'',url:'',open:false};
+const ATT_DEFAULT='https://script.google.com/macros/s/AKfycbxOKCaxjCe0yA-lI2uWNwDv1yCk-WupUG1cMdTQsHqYUR4kH-qIDl3LmRuIKw5E6ugf/exec';
+U.att.url=ATT_DEFAULT;try{U.att.url=localStorage.getItem('lax_att_url')||ATT_DEFAULT}catch(e){}
+const attCfg=()=>{try{return JSON.parse(localStorage.getItem('lax_att_cfg')||'{}')}catch(e){return{}}};
+const attSet=(k,v)=>{const c=attCfg();c[k]=v;try{localStorage.setItem('lax_att_cfg',JSON.stringify(c))}catch(e){}};
+const t2m=s=>{const m=/^(\d{1,2}):(\d{2})/.exec(s||'');return m?(+m[1])*60+(+m[2]):null};
+const fmtMin=m=>{if(m==null)return '';m=((Math.round(m)%1440)+1440)%1440;const h=Math.floor(m/60),mm=String(m%60).padStart(2,'0');return (h%12||12)+':'+mm+' '+(h<12?'AM':'PM')};
+function parsePunch(v){
+  if(v==null||v==='')return null;
+  if(typeof v==='number'){
+    if(v>0&&v<1)return{date:null,min:Math.round(v*1440)};
+    if(v>=25569&&v<80000){const dt=toIsoDate(Math.floor(v));return{date:dt,min:Math.round((v-Math.floor(v))*1440)}}
+    return null;
+  }
+  const s=String(v).trim(),tm=/(\d{1,2}):(\d{2})(?::\d{2})?\s*(AM|PM)?/i.exec(s);if(!tm)return null;
+  let h=+tm[1];const ap=(tm[3]||'').toUpperCase();if(ap==='PM'&&h<12)h+=12;if(ap==='AM'&&h===12)h=0;
+  const date=/\d{4}-\d{2}-\d{2}|\d{1,2}\/\d{1,2}\/\d{2,4}/.test(s)?toIsoDate(s):null;
+  return{date,min:h*60+(+tm[2])};
+}
+const dayDiff=(a,b)=>Math.round((iso2d(a)-iso2d(b))/864e5);
+function attAutoMap(){
+  const m=U.att.map,hs=[...new Set(U.att.files.flatMap(f=>f.headers))],used=new Set(Object.values(m));
+  const rules={name:[/first|\bf\s*name/i,/^(employee\s*)?name$|^(associate|worker|employee)(\s*name)?$/i,/name/i],name2:[/last|\bl\s*name/i],date:[/date|^day$/i],in:[/clock\s*in|punch\s*in|time\s*in|^in$|^in\b|start|first/i],out:[/clock\s*out|punch\s*out|time\s*out|^out$|^out\b|end|last punch/i]};
+  ['name','name2','date','in','out'].forEach(r=>{
+    if(m[r]&&hs.includes(m[r]))return;delete m[r];
+    let h=null;for(const x of rules[r]){h=hs.find(y=>!used.has(y)&&x.test(y)&&!/\bid\b|number|#/i.test(y));if(h)break}
+    if(h){m[r]=h;used.add(h)}
+  });
+}
+function attShifts(){const c=attCfg();return(c.sh||[]).map((x,i)=>({i,S:t2m(x&&x.s),F:t2m(x&&x.f)})).filter(x=>x.S!=null&&x.F!=null)}
+function attGroup(){
+  const m=U.att.map;if(!m.in||!m.name)return[];
+  const g={};
+  U.att.files.forEach(f=>{
+    const ix=k=>m[k]?f.headers.indexOf(m[k]):-1,ni=ix('name'),n2=ix('name2'),di=ix('date'),ii=ix('in'),oi=ix('out');
+    if(ni<0||ii<0)return;
+    f.data.forEach(r=>{
+      if(r.some(x=>typeof x==='string'&&/^\s*(grand\s*)?totals?\b/i.test(x)))return;
+      let name=String(r[ni]||'').trim();if(n2>=0&&r[n2])name=String(r[n2]).trim()+', '+name;if(!name)return;
+      const pin=parsePunch(r[ii]),pout=oi>=0?parsePunch(r[oi]):null;
+      const date=(di>=0?toIsoDate(r[di]):null)||(pin&&pin.date)||f.fdate;if(!date)return;
+      const key=name.toLowerCase()+'|'+date,x=g[key]||(g[key]={name,date,ins:[],outs:[]});
+      const abs=p=>(p.date?dayDiff(p.date,date):0)*1440+p.min;
+      if(pin){const ia=abs(pin);x.ins.push(ia);if(pout){let oa=abs(pout);if(oa<=ia)oa+=1440;x.outs.push(oa)}}
+      else if(pout)x.outs.push(abs(pout));
+    });
+  });
+  return Object.values(g).map(x=>{
+    let inn=null,out=null;
+    if(m.out){inn=x.ins.length?Math.min(...x.ins):null;out=x.outs.length?Math.max(...x.outs):null}
+    else{const a=x.ins.slice().sort((p,q)=>p-q);inn=a.length?a[0]:null;out=a.length>1?a[a.length-1]:null}
+    if(inn==null&&out==null)return null;
+    return{name:x.name,date:x.date,inn,out};
+  }).filter(Boolean);
+}
+function attCompute(){
+  const c=attCfg(),SH=attShifts(),gl=Math.max(0,num(c.graceL)),ge=Math.max(0,num(c.graceE));
+  if(!SH.length)return{ready:false,rows:[]};
+  const rows=attGroup().map(x=>{
+    const inn=x.inn,out=x.out;
+    const ref=inn!=null?inn:out-480,dm=((ref%1440)+1440)%1440;
+    let best=SH[0],bd=1e9;SH.forEach(s=>{const d=Math.abs(((dm-s.S+720+1440)%1440)-720);if(d<bd){bd=d;best=s}});
+    const F2=best.F<=best.S?best.F+1440:best.F,delta=inn!=null?((inn-best.S+720+1440*3)%1440)-720:0;
+    const late=inn!=null&&delta>gl?delta:0,early=out!=null&&F2-out>ge?F2-out:0;
+    return{name:x.name,date:x.date,inn,out,late,early,sh:best.i+1,pts:(late?1:0)+(early?1:0),noIn:inn==null,noOut:out==null};
+  }).sort((a,b)=>a.date<b.date?-1:a.date>b.date?1:a.name.localeCompare(b.name));
+  return{ready:true,rows};
+}
+const recOf=r=>({name:r.name,date:r.date,inn:fmtMin(r.inn),out:fmtMin(r.out),late:r.late,early:r.early,pts:r.pts});
+function ledgerLocal(){try{return JSON.parse(localStorage.getItem('lax_att_ledger')||'[]')}catch(e){return[]}}
+function ledgerUpsert(keys,recs){const ks=new Set(keys);let L=ledgerLocal().filter(r=>!ks.has(r.name.toLowerCase()+'|'+r.date)).concat(recs);try{localStorage.setItem('lax_att_ledger',JSON.stringify(L))}catch(e){}U.att.recs=L}
+async function attLoadLedger(){
+  if(!U.att.url){U.att.recs=ledgerLocal();return}
+  try{const r=await fetch(U.att.url+(U.att.url.includes('?')?'&':'?')+'t='+Date.now(),{cache:'no-store'});const j=JSON.parse(await r.text());if(j&&j.records)U.att.recs=j.records}catch(e){U.att.status='Could not read the attendance sheet: '+e.message}
+  if(U.sec==='attendance')render();
+}
+async function attSend(){
+  const res=attCompute();if(!res.ready){toast('Set the start and finish times and the columns first.');return}
+  const AB=absCompute(res),keys=res.rows.map(r=>r.name.toLowerCase()+'|'+r.date).concat(AB.list.map(x=>x.key)),recs=res.rows.filter(r=>r.pts>0).map(recOf).concat(AB.list.filter(x=>!x.ex).map(absRec));
+  U.att.status='Sending…';render();
+  try{
+    if(U.att.url){
+      const r=await fetch(U.att.url,{method:'POST',headers:{'Content-Type':'text/plain;charset=utf-8'},body:JSON.stringify({keys,records:recs})});
+      const j=JSON.parse(await r.text());if(!j.ok)throw new Error(j.error||'the sheet rejected it');
+      U.att.status='Sent '+recs.length+' infraction'+(recs.length===1?'':'s')+' to the Google Sheet at '+hhmm(Date.now())+'.';await attLoadLedger();
+    }else{ledgerUpsert(keys,recs);U.att.status='Saved '+recs.length+' infraction'+(recs.length===1?'':'s')+' in this browser only. Connect a Google Sheet so everyone sees the totals.'}
+  }catch(e){U.att.status='Not sent: '+e.message}
+  render();
+}
+
+// ===== Absences: scheduled in SmartSuite (day off is not that day) but no punch =====
+const nameToks=s=>String(s||'').toLowerCase().replace(/[^a-z\s]/g,' ').split(/\s+/).filter(Boolean);
+function absCompute(res){
+  const out={ready:false,list:[],people:0,diag:[]};
+  if(!res.ready||!U.sch.people.length)return out;
+  out.ready=true;
+  const rows=res.rows,dates=[...new Set(rows.map(r=>r.date))].sort();
+  const sets=rows.map(r=>({date:r.date,name:r.name,t:new Set(nameToks(r.name))}));
+  const roster=U.sch.people.filter(schIsAct).map(p=>{const t=nameToks(p.name);return {p,f:t[0],l:t[t.length-1],ok:t.length>=2}}).filter(x=>x.ok);
+  out.people=roster.length;
+  const P=U.sch.people;out.stat={total:P.length,noShift:P.filter(p=>!p.shift).length,inactive:P.filter(p=>/^(INACTIVE|DNR)$/i.test(p.shift)).length,active:P.filter(schIsAct).length,oneName:P.filter(schIsAct).length-roster.length,punchPeople:new Set(sets.map(s=>s.name.toLowerCase())).size,rosterSample:P.slice(0,6).map(p=>p.name+' ['+p.shift+'; off '+(p.off.join('/')||'none')+']'),punchSample:[...new Set(sets.map(s=>s.name))].slice(0,6)};
+  const has=(S,x)=>S.t.has(x.f)&&S.t.has(x.l);
+  const seen=new Set();
+  dates.forEach(d=>{
+    const dow=SCH_DAYS[iso2d(d).getDay()],today=sets.filter(s=>s.date===d);let sched=0,hit=0;
+    roster.forEach(x=>{
+      if(x.p.off.includes(dow))return;sched++;
+      if(today.some(s=>has(s,x))){hit++;return}
+      const any=sets.find(s=>has(s,x)),name=any?any.name:x.p.name,key=name.toLowerCase()+'|'+d;
+      if(seen.has(key))return;seen.add(key);
+      out.list.push({name,date:d,shift:x.p.shift,dept:x.p.dept,key,ex:!!(U.att.excl&&U.att.excl[key])});
+    });
+    out.diag.push({d,dow,sched,hit,punched:new Set(today.map(s=>s.name.toLowerCase())).size});
+  });
+  out.list.sort((p,q)=>p.date<q.date?-1:p.date>q.date?1:p.name.localeCompare(q.name));
+  return out;
+}
+const absRec=x=>({name:x.name,date:x.date,inn:'ABSENT',out:'',late:0,early:0,pts:2});
+const diagHtml=A=>{const s=A.stat;return `<details class="map"><summary>How this was checked</summary><div class="empty" style="font-size:12px;line-height:1.6">Roster: ${s.total} people, ${s.active} active (${s.inactive} inactive/DNR, ${s.noShift} with no shift${s.oneName?', '+s.oneName+' skipped for a one-word name':''}). Punch report: ${s.punchPeople} people.<br>${A.diag.map(x=>`${x.d} (${x.dow.slice(0,3)}): ${x.sched} scheduled, ${x.punched} punched, ${x.hit} matched to a punch, ${x.sched-x.hit} absent`).join('<br>')}<br><b>Roster sample:</b> ${s.rosterSample.map(esc).join(' · ')}<br><b>Punch sample:</b> ${s.punchSample.map(esc).join(' · ')}</div></details>`};
+function absView(res){
+  const a=U.att;if(!res.ready)return'';
+  const A=absCompute(res);
+  let h=`<h3 style="margin-top:22px">Absences · scheduled but no punch · 2 points</h3>`;
+  if(!A.ready)return h+`<div class="row"><button class="pri" id="aLoadSch">${U.sch.loading?'Loading…':'Load the schedule from SmartSuite'}</button></div><div class="empty">${U.sch.status&&!U.sch.people.length?esc(U.sch.status)+' ':''}The Schedule roster is needed to know who was supposed to work each day. Load it, then the absences show here.</div>`;
+  const on=A.list.filter(x=>!x.ex);
+  h+=`<div class="kpis"><div class="kpi"><div class="l">Absences</div><div class="v">${on.length}</div><div class="s">${on.length*2} points · 2 each</div></div><div class="kpi"><div class="l">Days checked</div><div class="v">${new Set(res.rows.map(r=>r.date)).size}</div><div class="s">${A.people} active on the roster</div></div></div>`;
+  if(!A.list.length)return h+`<div class="empty">No absences found.</div>`+diagHtml(A);
+  h+=`<div class="scroll"><table class="rt"><thead><tr><th class="p">Name</th><th>Date</th><th>Day</th><th>Shift</th><th>Department</th><th>Points</th><th></th></tr></thead><tbody>${A.list.map(x=>`<tr class="${x.ex?'z':''}"><td class="p">${esc(x.name)}</td><td>${mdy(x.date)}</td><td>${D3[(iso2d(x.date).getDay()+6)%7]}</td><td>${esc(x.shift)}</td><td>${esc(x.dept)}</td><td><b>${x.ex?0:2}</b></td><td><button data-aex="${esc(x.key)}">${x.ex?'Count it':'Not absent'}</button></td></tr>`).join('')}</tbody></table></div>
+   <div class="empty" style="font-size:12px;padding:6px 0">Absent = on the SmartSuite roster as active, that weekday is not in DAYS OFF, and no punch with a matching first and last name that day. Use “Not absent” for a name mismatch or an excused day. Send to Google Sheet adds the absences to the ledger.</div>`+diagHtml(A);
+  return h;
+}
+function attView(){
+  const a=U.att,c=attCfg(),res=attCompute(),m=a.map;
+  let h=`<div class="drop" id="adrop" role="button" tabindex="0"><b>Drop the punch report here</b><span>.xlsx · one or several files · click to choose</span><input type="file" id="afi" accept=".xlsx,.xls,.csv" multiple hidden></div>`;
+  h+=`<div class="bar">${[0,1,2].map(i=>{const x=(c.sh||[])[i]||{};return `<label>Shift ${i+1} start<input type="time" data-sh="${i}:s" value="${esc(x.s||'')}"></label><label>Shift ${i+1} finish<input type="time" data-sh="${i}:f" value="${esc(x.f||'')}"></label>`}).join('')}<label>Late grace (min)<input type="number" min="0" id="aGL" value="${esc(c.graceL||0)}" style="width:90px"></label><label>Early-out grace (min)<input type="number" min="0" id="aGE" value="${esc(c.graceE||0)}" style="width:90px"></label><div class="sp"></div><button id="aGs">${a.url?'Google Sheet ✓':'Google Sheet'}</button></div>`;
+  if(a.open)h+=`<div class="bar" style="flex-direction:column;align-items:stretch"><div style="display:flex;gap:8px;flex-wrap:wrap"><label style="flex:1;min-width:260px">Apps Script web app URL<input id="aUrl" value="${esc(a.url)}" placeholder="https://script.google.com/macros/s/.../exec" style="width:100%"></label><button class="pri" id="aUrlGo">Connect</button><button id="aCopy">Copy Apps Script</button>${a.url?'<button id="aUrlOff" class="danger">Disconnect</button>':''}</div>
+   <ol style="margin:6px 0 0;padding-left:18px;line-height:1.7;font-size:13px"><li>Create a <b>new</b> Google Sheet for attendance (separate from the labor sheet).</li><li>Extensions → Apps Script, delete the sample code, click <b>Copy Apps Script</b> here, paste, Save.</li><li>Deploy → New deployment → Web app. Execute as <b>Me</b>, who has access <b>Anyone</b>. Deploy and allow access.</li><li>Paste the web app URL (ends in /exec) above and press Connect. Two tabs appear in the sheet: <b>Infractions</b> and <b>Totals</b>.</li></ol></div>`;
+  if(a.files.length){
+    const hdrs=[...new Set(a.files.flatMap(f=>f.headers))];
+    h+=`<details class="map" ${(!m.name||!m.in)?'open':''}><summary>Column mapping · ${a.files.length} sheet${a.files.length>1?'s':''} loaded</summary><div class="maps">${AR.map(([k,l])=>`<label>${l}<select data-amap="${k}"><option value="">(none)</option>${hdrs.map(x=>`<option ${m[k]===x?'selected':''}>${esc(x)}</option>`).join('')}</select></label>`).join('')}</div>
+    <div class="flist">${a.files.map((f,i)=>`<span class="chip">${esc(f.name)} · ${f.data.length} rows <button data-arm="${i}" title="Remove">×</button></span>`).join('')}</div>
+    <div class="empty" style="padding:4px 0;font-size:12px">Each person's day uses the earliest In and the latest Out, so meal-break punches are ignored. Each person is matched to the shift whose start is closest to their first punch. If the report has one punch per row, map only <b>Clock in</b>. Date comes from the Date column, the punch itself, or the file name.</div></details>`;
+  }
+  if(a.status)h+=`<div class="empty" style="padding:6px 0;font-weight:600">${esc(a.status)}</div>`;
+  if(a.files.length&&!res.ready)h+=`<div class="panel empty" style="border-top:1px solid var(--line);border-radius:10px">Enter at least one shift start and finish time${(!m.name||!m.in)?' and pick the Name and Clock in columns':''} to see who was late or left early.</div>`;
+  if(res.ready){
+    const inf=res.rows.filter(r=>r.pts>0),late=res.rows.filter(r=>r.late).length,early=res.rows.filter(r=>r.early).length,miss=res.rows.filter(r=>r.noIn||r.noOut).length;
+    const shown=a.all?res.rows:inf;
+    h+=`<div class="panel"><div class="ttl"><h2>Punch review</h2><span class="m">${attShifts().map(x=>'Shift '+(x.i+1)+' '+fmtMin(x.S)+'–'+fmtMin(x.F)).join(' · ')}</span></div><div class="kpis">
+     <div class="kpi"><div class="l">Employee-days</div><div class="v">${res.rows.length}</div><div class="s">${new Set(res.rows.map(r=>r.name.toLowerCase())).size} people</div></div>
+     <div class="kpi"><div class="l">Late</div><div class="v">${late}</div><div class="s">1 point each</div></div>
+     <div class="kpi"><div class="l">Left early</div><div class="v">${early}</div><div class="s">1 point each</div></div>
+     <div class="kpi"><div class="l">Points this drop</div><div class="v">${inf.reduce((s,r)=>s+r.pts,0)}</div><div class="s">${miss?miss+' with a missing punch (no point)':'all punches present'}</div></div></div>
+     <div class="row"><label class="ck"><input type="checkbox" id="aAll" ${a.all?'checked':''}> Show everyone, not just infractions</label><div class="sp"></div><button class="pri" id="aSend">${a.url?'Send to Google Sheet':'Save to ledger'}</button></div>
+     <div class="scroll"><table class="rt"><thead><tr><th class="p">Name</th><th>Date</th><th>Shift</th><th>In</th><th>Out</th><th>Late (min)</th><th>Early (min)</th><th>Points</th></tr></thead><tbody>${shown.map(r=>`<tr class="${r.pts?'':'z'}"><td class="p">${esc(r.name)}</td><td>${mdy(r.date)}</td><td>${r.sh}</td><td>${r.noIn?'<small>no punch</small>':fmtMin(r.inn)}</td><td>${r.noOut?'<small>no punch</small>':fmtMin(r.out)}</td><td>${r.late||'–'}</td><td>${r.early||'–'}</td><td><b>${r.pts||'–'}</b></td></tr>`).join('')||'<tr><td class="p" colspan="8">No infractions in this report.</td></tr>'}</tbody></table></div></div>`;
+  }
+  h+=absView(res);
+  h+=attLedgerView();
+  return h;
+}
+function delBtn(k,l){const armed=U.att.arm===k;return `<button data-adel="${esc(k)}" style="padding:3px 9px;border:1px solid var(--line);border-radius:6px;cursor:pointer;background:${armed?'#c0392b':'var(--soft)'};color:${armed?'#fff':'var(--ink)'}">${armed?'Sure? Click again':l}</button>`}
+async function attDelete(k){
+  if(U.att.arm!==k){U.att.arm=k;render();clearTimeout(U._ad);U._ad=setTimeout(()=>{U.att.arm=null;if(U.sec==='attendance')render()},4000);return}
+  U.att.arm=null;
+  const person=k.startsWith('P|'),nm=k.split('|')[1],dt=k.split('|')[2];
+  const gone=U.att.recs.filter(r=>person?r.name.toLowerCase()===nm:(r.name.toLowerCase()===nm&&r.date===dt));
+  const keys=[...new Set(gone.map(r=>r.name.toLowerCase()+'|'+r.date))];
+  if(!keys.length){render();return}
+  U.att.status='Deleting…';render();
+  try{
+    if(U.att.url){
+      const r=await fetch(U.att.url,{method:'POST',headers:{'Content-Type':'text/plain;charset=utf-8'},body:JSON.stringify({keys,records:[]})});
+      const j=JSON.parse(await r.text());if(!j.ok)throw new Error(j.error||'the sheet rejected it');
+      U.att.status='Deleted '+gone.length+' infraction'+(gone.length===1?'':'s')+' from the Google Sheet.';await attLoadLedger();
+    }else{ledgerUpsert(keys,[]);U.att.status='Deleted '+gone.length+' infraction'+(gone.length===1?'':'s')+' from this browser.'}
+  }catch(e){U.att.status='Not deleted: '+e.message}
+  render();
+}
+function attLedgerView(){
+  const a=U.att,t={};
+  a.recs.forEach(r=>{const k=r.name.toLowerCase(),x=t[k]||(t[k]={n:r.name,p:0,l:0,e:0,lm:0,em:0,d:''});if(r.inn==='ABSENT')x.a=(x.a||0)+1;x.p+=num(r.pts);x.lm+=num(r.late);x.em+=num(r.early);if(num(r.late)>0)x.l++;if(num(r.early)>0)x.e++;if(r.date>x.d)x.d=r.date});
+  const L=Object.values(t).sort((p,q)=>q.p-p.p||p.n.localeCompare(q.n)),q=a.q.toLowerCase(),LS=L.filter(x=>!q||x.n.toLowerCase().includes(q));
+  let h=`<h3>Total infractions by person ${a.url?'· from the Google Sheet':'· saved in this browser'}</h3>`;
+  if(!L.length)return h+'<div class="empty">No infractions recorded yet.</div>';
+  const T10=L.slice(0,10),mx=Math.max(1,...T10.map(x=>x.p));
+  h+=`<div class="panel" style="border-radius:10px;border-top:1px solid var(--line);margin-bottom:12px"><div class="ttl"><h2>Top 10 · most points</h2></div><table class="rt"><thead><tr><th>#</th><th class="p">Name</th><th>Points</th><th style="width:40%"></th></tr></thead><tbody>${T10.map((x,i)=>`<tr><td>${i+1}</td><td class="p">${esc(x.n)}</td><td><b>${x.p}</b></td><td style="text-align:left"><div style="height:10px;border-radius:5px;background:var(--reg);width:${Math.max(4,Math.round(x.p/mx*100))}%"></div></td></tr>`).join('')}</tbody></table></div>`;
+  h+=`<div class="row"><input id="aQ" placeholder="Search name" value="${esc(a.q)}" style="padding:6px 10px;border:1px solid var(--line);border-radius:6px;background:var(--soft);color:var(--ink)"></div><div class="scroll"><table class="rt"><thead><tr><th class="p">Name</th><th>Total points</th><th>Late days</th><th>Early-out days</th><th>Absences</th><th>Total min late</th><th>Total min left early</th><th>Last infraction</th><th></th></tr></thead><tbody>${LS.map(x=>`<tr><td class="p">${esc(x.n)}</td><td><b>${x.p}</b></td><td>${x.l}</td><td>${x.e}</td><td>${x.a||0}</td><td>${x.lm}</td><td>${x.em}</td><td>${x.d?mdy(x.d):''}</td><td>${delBtn('P|'+x.n.toLowerCase(),'Clear all')}</td></tr>`).join('')}</tbody></table></div>`;
+  const R=a.recs.filter(r=>!q||r.name.toLowerCase().includes(q)).slice().sort((p,q2)=>p.date<q2.date?1:p.date>q2.date?-1:p.name.localeCompare(q2.name)).slice(0,60);
+  h+=`<h3>Recent infractions</h3><div class="scroll"><table class="rt"><thead><tr><th class="p">Name</th><th>Date</th><th>In</th><th>Out</th><th>Late (min)</th><th>Early (min)</th><th>Points</th><th></th></tr></thead><tbody>${R.map(r=>`<tr><td class="p">${esc(r.name)}</td><td>${r.date?mdy(r.date):''}</td><td>${esc(r.inn||'')}</td><td>${esc(r.out||'')}</td><td>${num(r.late)||'–'}</td><td>${num(r.early)||'–'}</td><td><b>${num(r.pts)}</b></td><td>${delBtn('R|'+r.name.toLowerCase()+'|'+r.date,'Delete')}</td></tr>`).join('')}</tbody></table></div>`;
+  return h;
+}
+STATE.punchHC=STATE.punchHC||{};
+function attBuildHC(){
+  const by={};
+  attGroup().forEach(r=>{
+    const s=r.inn!=null?r.inn:r.out,e=r.out!=null?r.out:r.inn;if(s==null)return;
+    const o=by[r.date]||(by[r.date]={t:new Array(36).fill(0),d:new Array(36).fill(0),n:0});o.n++;
+    for(let h=0;h<36;h++){const a=h*60,b=a+60;if(s<=a&&e>a)o.t[h]++;if(s<b&&(e>a||(e===s&&s>=a)))o.d[h]++}
+  });
+  Object.keys(by).forEach(d=>{STATE.punchHC[d]=by[d]});
+  return Object.keys(by).length;
+}
+const hrLabel=h=>{const x=h%24;return (x%12||12)+(x<12?' AM':' PM')+(h>=24?' (+1)':'')};
+
+function fillData(wk,d){
+  const date=addDays(wk,d),w=STATE.weeks[wk],pc=(STATE.punchHC||{})[date];
+  const dur={o:num(STATE.hours.opening)||9,e:num(STATE.hours.early)||9,m:num(STATE.hours.mid)||9,r:num(STATE.hours.regular)||12},def={o:300,e:420,m:750,r:900};
+  const plan=new Array(36).fill(0),starts={};
+  Object.values((w&&w.days&&w.days[d])||{}).forEach(r=>{[1,2].forEach(s=>['o','e','m','r'].forEach(g=>{
+    const hc=num(r[g+s]);if(!(hc>0))return;let st=tmin(r['t'+g+s]);if(st>=9999)st=def[g];
+    const en=st+dur[g]*60;starts[Math.floor(st/60)]=(starts[Math.floor(st/60)]||0)+hc;
+    for(let h=0;h<36;h++)if(st<(h+1)*60&&en>h*60)plan[h]+=hc}))});
+  return {plan,starts,pc};
+}
+function fillView(wk,mode){
+  const D=[0,1,2,3,4,5,6].map(d=>fillData(wk,d)),has=D.map(x=>x.pc&&x.plan.some(v=>v>0));
+  let h=`<h3 style="margin-top:22px">Fill rate at shift start · punched in vs the weekly labor request</h3>`;
+  if(!has.some(Boolean))return h+`<div class="empty">Needs both: the Weekly Labor Request for this week (with start times) and the punch report for the same days.</div>`;
+  if(U.fday==null||!has[U.fday])U.fday=has.findIndex(Boolean);
+  const fd=U.fday,X=D[fd],act=X.pc[mode];
+  const sums=D.map((x,i)=>{if(!has[i])return null;let w=0,f=0;Object.keys(x.starts).forEach(k=>{const p=x.plan[k];if(p>0){w+=x.starts[k];f+=x.starts[k]*(x.pc[mode][k]||0)/p}});return {w,f}});
+  h+=`<div class="kpis">${sums.map((s,i)=>`<div class="kpi" style="cursor:pointer;${i===fd?'outline:2px solid var(--brand)':''}" data-fday="${i}"><div class="l">${D3[i]} ${md(addDays(wk,i))}</div><div class="v">${s&&s.w?Math.round(s.f/s.w*100)+'%':'–'}</div><div class="s">${s?fmt(s.w)+' requested starts':'no data'}</div></div>`).join('')}</div>`;
+  const hrs=[];for(let i=0;i<36;i++)if(X.plan[i]>0||act[i]>0)hrs.push(i);
+  const h0=hrs[0],h1=hrs[hrs.length-1],n=h1-h0+1,mx=Math.max(1,...X.plan,...act),{step,top}=niceScale(mx);
+  const W_=640,H=272,L=40,R=12,TP=36,B=34,iw=W_-L-R,ih=H-TP-B,xp=i=>L+(n<=1?iw/2:(i-h0)/(n-1)*iw),yp=v=>TP+ih-v/top*ih;
+  let s=`<div class="legend"><span><i style="background:var(--early)"></i>Requested (on site)</span><span><i style="background:var(--reg)"></i>Actual (punched)</span></div><svg viewBox="0 0 ${W_} ${H}" width="100%" role="img" aria-label="Fill rate for ${DAYS[fd]}">`;
+  for(let v=0;v<=top+1e-9;v+=step)s+=`<line x1="${L}" x2="${W_-R}" y1="${yp(v)}" y2="${yp(v)}" stroke="var(--line)"/><text x="${L-6}" y="${yp(v)+4}" text-anchor="end" font-size="11">${fmt(v)}</text>`;
+  for(let i=h0;i<=h1;i++)s+=`<text x="${xp(i)}" y="${H-14}" text-anchor="middle" font-size="10">${(i%24%12||12)+(i%24<12?'a':'p')}</text>`;
+  const path=arr=>hrs.length?arr.slice(h0,h1+1).map((v,k)=>(k?'L':'M')+xp(h0+k)+' '+yp(v)).join(' '):'';
+  s+=`<path d="${path(X.plan)}" fill="none" stroke="var(--early)" stroke-width="2.5" stroke-dasharray="6 4"/><path d="${path(act)}" fill="none" stroke="var(--reg)" stroke-width="2.5"/>`;
+  Object.keys(X.starts).map(Number).sort((a,b)=>a-b).forEach((k,ki)=>{const p=X.plan[k],a=act[k]||0,pct=p?Math.round(a/p*100):0;
+    s+=`<line x1="${xp(k)}" x2="${xp(k)}" y1="${TP}" y2="${TP+ih}" stroke="var(--mute)" stroke-dasharray="2 3"/><circle cx="${xp(k)}" cy="${yp(a)}" r="4" fill="var(--reg)"/><text x="${xp(k)}" y="${TP-6-(ki%2)*15}" text-anchor="middle" font-size="12" font-weight="700" fill="${pct>=95?'var(--reg)':'#c0392b'}">${pct}%</text>`});
+  s+='</svg>';
+  h+=`<div class="panel" style="border-radius:10px;border-top:1px solid var(--line);margin:10px 0"><div class="ttl"><h2>${DAYS[fd]} ${mdy(addDays(wk,fd))}</h2><span class="m">tap a day above</span></div>${s}`;
+  h+=`<div class="scroll"><table class="rt"><thead><tr><th class="p">Shift start</th><th>Requested starting</th><th>Requested on site</th><th>Actual on site</th><th>Fill rate</th><th>Short</th></tr></thead><tbody>${Object.keys(X.starts).map(Number).sort((a,b)=>a-b).map(k=>{const p=X.plan[k],a=act[k]||0;return `<tr><td class="p">${hrLabel(k)}</td><td>${fmt(X.starts[k])}</td><td>${fmt(p)}</td><td>${fmt(a)}</td><td><b>${p?Math.round(a/p*100)+'%':'–'}</b></td><td>${p>a?fmt(p-a):'–'}</td></tr>`}).join('')}</tbody></table></div>
+   <div class="empty" style="font-size:12px;padding:6px 0">Requested on site = everyone on the labor request whose shift (start time + paid hours for Opening / Early / Mid / Regular) covers that hour. Actual = the punch report headcount for the same hour. Later starts include people still on from earlier shifts.</div></div>`;
+  return h;
+}
+function hcSection(){
+  const dates=Object.keys(STATE.punchHC||{}).sort();
+  let h=`<h3>Hour over hour headcount · from the punch report</h3>`;
+  if(!dates.length)return `<div class="panel" style="border-radius:10px;border-top:1px solid var(--line)">${h}<div class="empty">No punch report yet. Drop it on the Attendance Points tab and the hourly headcount for each day shows here.</div></div>`;
+  const weeks=[...new Set(dates.map(mondayOf))].sort();
+  if(!U.hcweek||!weeks.includes(U.hcweek))U.hcweek=weeks[weeks.length-1];
+  const wk=U.hcweek,mode=U.hcMode==='t'?'t':'d',days=[0,1,2,3,4,5,6].map(d=>STATE.punchHC[addDays(wk,d)]);
+  const hrs=[];for(let i=0;i<36;i++)if(days.some(x=>x&&x[mode][i]>0))hrs.push(i);
+  h+=`<div class="row"><label class="ck">Week of <select id="hsel">${weeks.map(k=>`<option value="${k}" ${k===wk?'selected':''}>${mdy(k)} – ${mdy(addDays(k,6))}</option>`).join('')}</select></label><label class="ck">Count <select id="hmode"><option value="d" ${mode==='d'?'selected':''}>anyone on the clock during the hour</option><option value="t" ${mode==='t'?'selected':''}>on the clock at the top of the hour</option></select></label></div>`;
+  h+=`<div class="scroll"><table class="rt"><thead><tr><th class="p">Hour</th>${DAYS.map((d,i)=>`<th>${D3[i]}<br>${md(addDays(wk,i))}</th>`).join('')}<th>Avg</th></tr></thead><tbody>`;
+  hrs.forEach(i=>{const v=days.map(x=>x?x[mode][i]:0),n=v.filter(x=>x>0).length;h+=`<tr><td class="p">${hrLabel(i)}</td>${v.map(x=>`<td>${x||'–'}</td>`).join('')}<td>${n?Math.round(v.reduce((a,b)=>a+b,0)/n):'–'}</td></tr>`});
+  const pk=days.map(x=>x?Math.max(0,...x[mode]):0),tot=days.map(x=>x?x.n:0);
+  h+=`<tr class="tot"><td class="p">PEAK HEADCOUNT</td>${pk.map(x=>`<td>${x||'–'}</td>`).join('')}<td></td></tr><tr class="tot"><td class="p">PEOPLE PUNCHED</td>${tot.map(x=>`<td>${x||'–'}</td>`).join('')}<td></td></tr></tbody></table></div><div class="empty" style="padding:6px 0;font-size:12px">Each person counts once per day, from their first In to their last Out. Hours after midnight belong to the shift day that started before it, marked (+1).</div>`;
+  h+=fillView(wk,mode);
+  return `<div class="panel" style="border-radius:10px;border-top:1px solid var(--line);margin-top:14px">${h}</div>`;
+}
+async function loadPunch(list){
+  let n=0;
+  for(const f of list){
+    if(!/\.(xlsx?|csv)$/i.test(f.name)){toast(f.name+' is not an Excel file.');continue}
+    try{const tabs=parseReport(new Uint8Array(await f.arrayBuffer()),f.name);if(!tabs.length){toast('No table found in '+f.name);continue}
+      U.att.files=U.att.files.filter(x=>!tabs.some(t=>t.name===x.name));tabs.forEach(t=>U.att.files.push(t));n+=tabs.length}
+    catch(err){toast('Could not read '+f.name+': '+err.message)}
+  }
+  if(n){attAutoMap();U.att.status='';const nd=attBuildHC();markDirtyHC(nd);render();const r=attCompute();if(r.ready&&U.att.url)attSend()}
+}
+function renderAttendance(){
+  $('#app').innerHTML=`<div class="wrap"><div class="top"><div><div class="eyebrow">LAX Sorting Center · Lyneer</div><h1>Attendance <span>Points</span></h1></div><div class="save"><span id="stat" class="stat"></span><button class="pri" id="btnSave">Save for everyone</button></div></div>${secNav()}${attView()}</div>`;
+  const on=(id,ev,fn)=>{const el=document.getElementById(id);if(el)el.addEventListener(ev,fn)};
+  on('btnSave','click',save);updateStat();
+  on('adrop','click',()=>$('#afi').click());on('adrop','keydown',e=>{if(e.key==='Enter'||e.key===' '){e.preventDefault();$('#afi').click()}});
+  on('afi','change',e=>{loadPunch([...e.target.files]);e.target.value=''});
+  document.querySelectorAll('[data-sh]').forEach(el=>el.addEventListener('change',()=>{const [i,k]=el.dataset.sh.split(':'),sh=(attCfg().sh||[{},{},{}]).slice();while(sh.length<3)sh.push({});sh[+i]=Object.assign({},sh[+i],{[k]:el.value});attSet('sh',sh);render()}));
+  on('aGL','change',e=>{attSet('graceL',e.target.value);render()});on('aGE','change',e=>{attSet('graceE',e.target.value);render()});
+  on('aGs','click',()=>{U.att.open=!U.att.open;render()});
+  on('aCopy','click',async()=>{try{await navigator.clipboard.writeText(ATT_GS);toast('Apps Script copied. Paste it into the Apps Script editor.')}catch(e){const ta=document.createElement('textarea');ta.value=ATT_GS;document.body.appendChild(ta);ta.select();try{document.execCommand('copy');toast('Apps Script copied.')}catch(x){toast('Copy failed.')}ta.remove()}});
+  on('aUrlGo','click',async()=>{const v=($('#aUrl').value||'').trim();if(!/^https:\/\/script\.google\.com\/macros\/s\/.+\/exec/.test(v)){toast('That does not look like a web app URL ending in /exec.');return}U.att.url=v;try{localStorage.setItem('lax_att_url',v)}catch(e){}U.att.open=false;U.att.status='Connected.';await attLoadLedger();render()});
+  on('aUrlOff','click',()=>{U.att.url='';try{localStorage.removeItem('lax_att_url')}catch(e){}U.att.open=false;U.att.recs=ledgerLocal();render()});
+  document.querySelectorAll('[data-adel]').forEach(b=>b.addEventListener('click',()=>attDelete(b.dataset.adel)));on('aLoadSch','click',()=>schLoad(false));document.querySelectorAll('[data-aex]').forEach(b=>b.addEventListener('click',()=>{U.att.excl=U.att.excl||{};const k=b.dataset.aex;if(U.att.excl[k])delete U.att.excl[k];else U.att.excl[k]=1;render()}));on('aAll','change',e=>{U.att.all=e.target.checked;render()});on('aSend','click',attSend);
+  on('aQ','input',e=>{U.att.q=e.target.value;const p=e.target.selectionStart;render();const el=$('#aQ');if(el){el.focus();el.setSelectionRange(p,p)}});
+  document.querySelectorAll('[data-amap]').forEach(s=>s.addEventListener('change',()=>{if(s.value)U.att.map[s.dataset.amap]=s.value;else delete U.att.map[s.dataset.amap];if(attBuildHC())markDirty();render()}));
+  document.querySelectorAll('[data-arm]').forEach(b=>b.addEventListener('click',()=>{U.att.files.splice(+b.dataset.arm,1);render()}));
+}
+attLoadLedger();
+/* ---------- who's where (SmartSuite sign-in log) ---------- */
+const SS_GS="// SmartSuite proxy (only needed if the browser blocks direct SmartSuite calls).\n// New Apps Script project > paste > Deploy > New deployment > Web app (Execute as: Me, Who has access: Anyone).\nvar TOKEN = '__TOKEN__', ACCOUNT = '__ACCOUNT__';\nfunction doPost(e) {\n  try {\n    var b = JSON.parse(e.postData.contents);\n    if (String(b.path).indexOf('/applications/') !== 0) throw new Error('bad path');\n    var r = UrlFetchApp.fetch('https://app.smartsuite.com/api/v1' + b.path, {\n      method: String(b.method || 'POST').toLowerCase(), contentType: 'application/json', payload: JSON.stringify(b.body || {}), muteHttpExceptions: true,\n      headers: { 'Authorization': 'Token ' + TOKEN, 'ACCOUNT-ID': ACCOUNT }\n    });\n    return ContentService.createTextOutput(JSON.stringify({ status: r.getResponseCode(), body: r.getContentText() })).setMimeType(ContentService.MimeType.JSON);\n  } catch (err) { return ContentService.createTextOutput(JSON.stringify({ status: 500, body: String(err) })).setMimeType(ContentService.MimeType.JSON); }\n}\n";
+const WW_GS="// Who's Where: pulls the SmartSuite sign-in log (server side, so the browser never calls SmartSuite) and writes it to this sheet.\n// Paste into the \"LAX Who's Where\" sheet: Extensions > Apps Script, then Deploy > New deployment > Web app\n// (Execute as: Me, Who has access: Anyone). Paste the /exec URL into Who's Where > Settings > Google Sheet web app URL.\nvar TOKEN = '1b1e64df43e8f01eb429de372a04fe738b13c1ef', ACCOUNT = 'sz7b6s9h';\nvar TABLE = '6af219a6fa58cada72b72567', NAMES = '68de9a0917348caf0c52733d', F_NAME = 'sfe765fc33', F_AREA = 'scc21eba86';\nvar AREAS = { q4qV0: 'INBOUND', r1v33: 'OUTBOUND', yme0z: 'LINE 1', Jjxlx: 'LINE 2', W1SVo: 'LINE 3', '4zDCK': 'NARROW 1', TrhEF: 'NARROW 2', UWUjl: 'BOX MAKER', wOnnf: 'GUARD', '5O6Oi': 'CLEANER', ExzV3: 'LEAD' };\nvar ORDER = ['INBOUND', 'OUTBOUND', 'LINE 1', 'LINE 2', 'LINE 3', 'NARROW 1', 'NARROW 2', 'BOX MAKER', 'GUARD', 'CLEANER', 'LEAD'];\n\nfunction json_(o) { return ContentService.createTextOutput(JSON.stringify(o)).setMimeType(ContentService.MimeType.JSON); }\nfunction tab_(name) { var ss = SpreadsheetApp.getActiveSpreadsheet(); return ss.getSheetByName(name) || ss.insertSheet(name); }\nfunction head_(s, h) { if (s.getLastRow() === 0) { s.getRange(1, 1, 1, h.length).setValues([h]).setFontWeight('bold'); s.setFrozenRows(1); } }\nfunction ss_(app, offset, body) {\n  var r = UrlFetchApp.fetch('https://app.smartsuite.com/api/v1/applications/' + app + '/records/list/?limit=1000&offset=' + offset, {\n    method: 'post', contentType: 'application/json', muteHttpExceptions: true,\n    headers: { 'Authorization': 'Token ' + TOKEN, 'ACCOUNT-ID': ACCOUNT }, payload: JSON.stringify(body)\n  });\n  if (r.getResponseCode() >= 300) throw new Error('SmartSuite said ' + r.getResponseCode() + ': ' + r.getContentText().slice(0, 200));\n  return JSON.parse(r.getContentText());\n}\nfunction t_(r) { var f = r.first_created; var v = f && (f.on || f.date); return v ? new Date(v).getTime() : 0; }\nfunction all_(app, body, since) {\n  var out = [], offset = 0;\n  for (var i = 0; i \u003c 30; i++) {\n    var items = ss_(app, offset, body).items || [];\n    out = out.concat(items);\n    if (items.length \u003c 1000) break;\n    if (since && items.length && t_(items[items.length - 1]) && t_(items[items.length - 1]) \u003c since) break;\n    offset += items.length;\n  }\n  return out;\n}\nfunction links_(v) { return (Array.isArray(v) ? v : v ? [v] : []).map(function (x) { return x && typeof x === 'object' ? { id: x.id || x.record_id || '', title: x.title || x.name || '' } : { id: String(x), title: '' }; }); }\n\nfunction sync_(hrs) {\n  var since = hrs === 'today' ? new Date(new Date().setHours(0, 0, 0, 0)).getTime() : Date.now() - (Number(hrs) || 18) * 3600000;\n  var recs;\n  try { recs = all_(TABLE, { hydrated: true, sort: [{ field: 'first_created', direction: 'desc' }] }, since); }\n  catch (e) { recs = all_(TABLE, { hydrated: true }, 0); }\n  recs = recs.filter(function (r) { return !t_(r) || t_(r) >= since; });\n  var names = null, by = {};\n  recs.forEach(function (r) {\n    var l = links_(r[F_NAME])[0], name = r.title || '(no name)';\n    if (l) {\n      if (l.title) name = l.title;\n      else {\n        if (!names) { names = {}; all_(NAMES, { hydrated: true }, 0).forEach(function (n) { names[n.id] = n.title || ''; }); }\n        name = names[l.id] || l.id;\n      }\n    }\n    var key = (l && l.id) || name.toLowerCase(), av = r[F_AREA];\n    var area = av && typeof av === 'object' ? (av.label || AREAS[av.value] || av.value) : (AREAS[av] || av || 'No area');\n    var t = t_(r), st = r.status && r.status.value || '';\n    if (!by[key] || t >= by[key].t) by[key] = { name: name, area: String(area).trim(), t: t, st: st, rid: r.id, out: (r.due_date && r.due_date.to_date && r.due_date.to_date.date) || '' };\n  });\n  return Object.keys(by).map(function (k) { return by[k]; });\n}\nfunction write_(all, full) {\n  var people = all.filter(function (p) { return !exited_(p); });\n  var at = Utilities.formatDate(new Date(), Session.getScriptTimeZone(), 'M/d/yyyy h:mm a');\n  var H = ['Area', 'Name', 'Sign-in time', 'Status', 'Synced at'], cnt = {};\n  people.forEach(function (p) { cnt[p.area] = (cnt[p.area] || 0) + 1; });\n  var rank = function (a) { var i = ORDER.indexOf(a); return i \u003c 0 ? 99 : i; };\n  var rows = people.slice().sort(function (a, b) { return rank(a.area) - rank(b.area) || a.name.localeCompare(b.name); }).map(function (p) {\n    return [p.area, p.name, p.t ? Utilities.formatDate(new Date(p.t), Session.getScriptTimeZone(), 'M/d h:mm a') : '', p.st, at];\n  });\n  var cur = tab_('Current'); cur.clear();\n  var out = [H].concat(rows);\n  cur.getRange(1, 1, out.length, 5).setNumberFormat('@').setValues(out); cur.getRange(1, 1, 1, 5).setFontWeight('bold'); cur.setFrozenRows(1);\n  var areas = ORDER.concat(Object.keys(cnt).filter(function (a) { return ORDER.indexOf(a) \u003c 0; }));\n  if (full === false) return rows.length;\n  var sum = tab_('Area Counts'); head_(sum, ['Synced at', 'Area', 'People']);\n  var cr = areas.map(function (a) { return [at, a, String(cnt[a] || 0)]; });\n  sum.getRange(sum.getLastRow() + 1, 1, cr.length, 3).setNumberFormat('@').setValues(cr);\n  if (rows.length) { var hist = tab_('History'); head_(hist, H); hist.getRange(hist.getLastRow() + 1, 1, rows.length, 5).setNumberFormat('@').setValues(rows); }\n  return rows.length;\n}\nvar CH = ['When', 'Name', 'Action', 'From area', 'To area / area', 'Exit time', 'Key'];\nfunction log_(who, action, from, to, exit) {\n  var s = tab_('Changes'); head_(s, CH);\n  var at = Utilities.formatDate(new Date(), Session.getScriptTimeZone(), 'M/d/yyyy h:mm a');\n  s.getRange(s.getLastRow() + 1, 1, 1, 7).setNumberFormat('@').setValues([[at, who || '', action, from || '', to || '', exit || '', '']]);\n}\n// People who clocked out in SmartSuite (status Complete or an exit time set) are logged once to the Changes tab.\nfunction exited_(p) { return p.st === 'complete' || !!p.out; }\nfunction logExits_(people) {\n  var s = tab_('Changes'); head_(s, CH);\n  var seen = {}, n = s.getLastRow();\n  if (n > 1) s.getRange(2, 7, n - 1, 1).getValues().forEach(function (r) { if (r[0]) seen[r[0]] = 1; });\n  var at = Utilities.formatDate(new Date(), Session.getScriptTimeZone(), 'M/d/yyyy h:mm a'), rows = [];\n  people.forEach(function (p) {\n    if (!exited_(p) || !p.rid) return;\n    var key = p.rid + '|' + (p.out || 'done');\n    if (seen[key]) return;\n    seen[key] = 1;\n    rows.push([at, p.name, 'Clocked out (SmartSuite)', '', p.area, p.out ? Utilities.formatDate(new Date(p.out), Session.getScriptTimeZone(), 'M/d h:mm a') : '', key]);\n  });\n  if (rows.length) s.getRange(s.getLastRow() + 1, 1, rows.length, 7).setNumberFormat('@').setValues(rows);\n  return rows.length;\n}\n// Optional: Triggers (clock icon) > Add trigger > autoSync > Time-driven > every 5 minutes. Keeps the sheet current with the page closed.\nfunction autoSync() { var all = sync_('18'); logExits_(all); write_(all, false); }\nfunction doGet(e) {\n  try {\n    var p = (e && e.parameter) || {};\n    if (p.action === 'sync') {\n      var people = sync_(p.hrs), n = null, x = logExits_(people);\n      if (p.write === '1') n = write_(people, true);\n      return json_({ ok: true, people: people, wrote: n, exits: x });\n    }\n    if (p.action === 'move') {\n      var val = null; for (var k in AREAS) if (AREAS[k] === p.area) val = k;\n      if (!val || !p.rid) throw new Error('bad move request');\n      var payload = {}; payload[F_AREA] = val;\n      var r = UrlFetchApp.fetch('https://app.smartsuite.com/api/v1/applications/' + TABLE + '/records/' + encodeURIComponent(p.rid) + '/', {\n        method: 'patch', contentType: 'application/json', muteHttpExceptions: true,\n        headers: { 'Authorization': 'Token ' + TOKEN, 'ACCOUNT-ID': ACCOUNT }, payload: JSON.stringify(payload)\n      });\n      if (r.getResponseCode() >= 300) throw new Error('SmartSuite said ' + r.getResponseCode() + ': ' + r.getContentText().slice(0, 200));\n      log_(p.name, 'Moved', p.from, p.area, '');\n      return json_({ ok: true });\n    }\n    if (p.action === 'exit') {\n      if (!p.rid || !p.out) throw new Error('bad exit request');\n      var due = { to_date: { date: p.out, include_time: true } };\n      due.from_date = p['in'] ? { date: p['in'], include_time: true } : null;\n      var r3 = UrlFetchApp.fetch('https://app.smartsuite.com/api/v1/applications/' + TABLE + '/records/' + encodeURIComponent(p.rid) + '/', {\n        method: 'patch', contentType: 'application/json', muteHttpExceptions: true,\n        headers: { 'Authorization': 'Token ' + TOKEN, 'ACCOUNT-ID': ACCOUNT }, payload: JSON.stringify({ status: { value: 'complete' }, due_date: due })\n      });\n      if (r3.getResponseCode() >= 300) throw new Error('SmartSuite said ' + r3.getResponseCode() + ': ' + r3.getContentText().slice(0, 200));\n      log_(p.name, 'Exit', '', p.area, Utilities.formatDate(new Date(p.out), Session.getScriptTimeZone(), 'M/d h:mm a'));\n      return json_({ ok: true });\n    }\n    return json_({ ok: true });\n  } catch (err) { return json_({ ok: false, error: String(err) }); }\n}\n";
+const SS_AREAS={q4qV0:'INBOUND',r1v33:'OUTBOUND',yme0z:'LINE 1',Jjxlx:'LINE 2',W1SVo:'LINE 3','4zDCK':'NARROW 1',TrhEF:'NARROW 2',UWUjl:'BOX MAKER',wOnnf:'GUARD','5O6Oi':'CLEANER',ExzV3:'LEAD'};
+const SS_DEF={acct:'sz7b6s9h',token:'1b1e64df43e8f01eb429de372a04fe738b13c1ef',table:'6af219a6fa58cada72b72567',names:'68de9a0917348caf0c52733d',fName:'sfe765fc33',fArea:'scc21eba86',proxy:'',hrs:'18',hide:true,auto:true,sheet:''};
+const ssCfg=()=>{let c={};try{c=JSON.parse(localStorage.getItem('lax_ss')||'{}')}catch(e){}return Object.assign({},SS_DEF,c)};
+const ssSet=(k,v)=>{let c={};try{c=JSON.parse(localStorage.getItem('lax_ss')||'{}')}catch(e){}c[k]=v;try{localStorage.setItem('lax_ss',JSON.stringify(c))}catch(e){}};
+U.ws={recs:[],names:{},status:'',loading:false,at:0,open:false,q:'',timer:null};
+async function ssPost(path,body,method){
+  method=method||'POST';const c=ssCfg();
+  if(c.proxy){
+    const r=await fetch(c.proxy,{method:'POST',headers:{'Content-Type':'text/plain;charset=utf-8'},body:JSON.stringify({path,body,method})});
+    const j=JSON.parse(await r.text());if(j.status<200||j.status>=300)throw new Error('SmartSuite said '+j.status+': '+String(j.body).slice(0,160));return JSON.parse(j.body);
+  }
+  let r;
+  try{r=await fetch('https://app.smartsuite.com/api/v1'+path,{method,headers:{'Authorization':'Token '+c.token,'ACCOUNT-ID':c.acct,'Content-Type':'application/json'},body:method==='GET'?undefined:JSON.stringify(body)})}
+  catch(e){throw new Error('The browser blocked the connection to SmartSuite. Open this page from your computer or Netlify (not inside claude.ai), or set up the Apps Script proxy in Settings.')}
+  if(!r.ok)throw new Error('SmartSuite said '+r.status+': '+(await r.text()).slice(0,160));
+  return r.json();
+}
+async function ssAll(appId,body,stop){
+  const out=[];let offset=0;
+  for(let i=0;i<30;i++){
+    const j=await ssPost('/applications/'+appId+'/records/list/?limit=1000&offset='+offset,Object.assign({hydrated:true},body));
+    const items=j.items||[];out.push(...items);
+    if(items.length<1000||(stop&&stop(items)))break;offset+=items.length;
+  }
+  return out;
+}
+const recTime=r=>{const f=r.first_created;const v=f&&(f.on||f.date);return v?new Date(v).getTime():0};
+const linkIds=v=>(Array.isArray(v)?v:v?[v]:[]).map(x=>x&&typeof x==='object'?{id:x.id||x.record_id||'',title:x.title||x.name||x.label||''}:{id:String(x),title:''});
+async function wsPush(){
+  const c=ssCfg(),w=U.ws;if(!c.sheet)return'';
+  const P=wsPeople(),order=Object.values(SS_AREAS),cnt={};P.forEach(p=>cnt[p.area]=(cnt[p.area]||0)+1);
+  const areas=[...new Set([...order,...Object.keys(cnt)])];
+  const rows=P.slice().sort((a,b)=>(order.indexOf(a.area)<0?99:order.indexOf(a.area))-(order.indexOf(b.area)<0?99:order.indexOf(b.area))||a.name.localeCompare(b.name)).map(p=>[p.area,p.name,p.t?new Date(p.t).toLocaleString([],{month:'numeric',day:'numeric',hour:'numeric',minute:'2-digit'}):'',(p.st||'')]);
+  const r=await fetch(c.sheet,{method:'POST',headers:{'Content-Type':'text/plain;charset=utf-8'},body:JSON.stringify({syncedAt:new Date().toLocaleString([],{month:'numeric',day:'numeric',year:'numeric',hour:'numeric',minute:'2-digit'}),rows,counts:areas.map(a=>[a,cnt[a]||0])})});
+  const j=JSON.parse(await r.text());if(!j.ok)throw new Error(j.error||'the sheet rejected it');return 'Pushed '+rows.length+' people to the Google Sheet at '+hhmm(Date.now())+'.';
+}
+async function wsSync(manual){
+  const c=ssCfg(),w=U.ws;if(w.loading)return;w.loading=true;w.status='Syncing with SmartSuite…';if(U.sec==='where')renderWhere();
+  try{
+    const hrs=c.hrs==='today'?null:num(c.hrs)||18,since=hrs===null?new Date().setHours(0,0,0,0):Date.now()-hrs*3600e3;
+    if(c.sheet){
+      const r=await fetch(c.sheet+(c.sheet.includes('?')?'&':'?')+'action=sync&hrs='+encodeURIComponent(c.hrs)+'&write='+(manual===true?1:0)+'&t='+Date.now(),{cache:'no-store'});
+      let j;try{j=JSON.parse(await r.text())}catch(e){throw new Error('The Google Sheet script did not answer. Redeploy it as a Web app open to Anyone using the newest script.')}
+      if(!j.ok)throw new Error(j.error||'the script failed');
+      w.srv=j.people||[];w.recs=[];w.at=Date.now();w.status=(manual===true?'Synced from SmartSuite and wrote '+(j.wrote||0)+' people to the Google Sheet at '+hhmm(Date.now())+'.':'')+(j.exits?' '+j.exits+' clocked out in SmartSuite, removed and logged to the Changes tab.':'');
+      w.loading=false;if(U.sec==='where')renderWhere();return;
+    }
+    w.srv=null;
+    let recs;
+    try{recs=await ssAll(c.table,{sort:[{field:'first_created',direction:'desc'}]},items=>items.length&&recTime(items[items.length-1])&&recTime(items[items.length-1])<since)}
+    catch(e){if(/SmartSuite said (400|422)/.test(e.message))recs=await ssAll(c.table,{});else throw e}
+    recs=recs.filter(r=>!recTime(r)||recTime(r)>=since);
+    const need=new Set();recs.forEach(r=>linkIds(r[c.fName]).forEach(x=>{if(!x.title&&x.id&&!w.names[x.id])need.add(x.id)}));
+    if(need.size&&c.names){const all=await ssAll(c.names,{});all.forEach(r=>{w.names[r.id]=r.title||''})}
+    w.recs=recs;w.at=Date.now();w.status='';
+  }catch(e){w.status='Could not sync: '+e.message}
+  w.loading=false;if(U.sec==='where')renderWhere();
+}
+function wsPeople(){
+  const c=ssCfg(),w=U.ws,by={};
+  if(w.srv)return w.srv.filter(p=>!(c.hide&&(p.st==='complete'||p.out)));
+  w.recs.forEach(r=>{
+    const st=r.status&&r.status.value;if(c.hide&&(st==='complete'||(r.due_date&&r.due_date.to_date&&r.due_date.to_date.date)))return;
+    const l=linkIds(r[c.fName])[0],name=l?(l.title||w.names[l.id]||l.id):(r.title||'(no name)'),key=(l&&l.id)||name.toLowerCase();
+    const av=r[c.fArea],area=av&&typeof av==='object'?(av.label||SS_AREAS[av.value]||av.value):(SS_AREAS[av]||av||'No area'),t=recTime(r);
+    if(!by[key]||t>=by[key].t)by[key]={name,area:String(area).trim(),t,st,rid:r.id,out:(r.due_date&&r.due_date.to_date&&r.due_date.to_date.date)||''};
+  });
+  return Object.values(by);
+}
+const SS_VAL=Object.fromEntries(Object.entries(SS_AREAS).map(([v,l])=>[l,v]));
+async function wsMove(rid,area){
+  const c=ssCfg(),w=U.ws,val=SS_VAL[area];if(!val){toast('Unknown area '+area);return}
+  const list=w.srv||w.recs,item=w.srv?w.srv.find(p=>p.rid===rid):w.recs.find(r=>r.id===rid);if(!item)return;
+  const old0=w.srv?item.area:item[c.fArea],old=w.srv?old0:(SS_AREAS[old0]||old0),nm=w.srv?item.name:(wsPeople().find(p=>p.rid===rid)||{}).name||'';
+  if(w.srv)item.area=area;else item[c.fArea]=val;
+  w.status='Moving to '+area+'…';renderWhere();
+  try{
+    if(c.sheet){
+      const r=await fetch(c.sheet+(c.sheet.includes('?')?'&':'?')+'action=move&rid='+encodeURIComponent(rid)+'&area='+encodeURIComponent(area)+'&name='+encodeURIComponent(nm)+'&from='+encodeURIComponent(old||'')+'&t='+Date.now(),{cache:'no-store'});
+      const j=JSON.parse(await r.text());if(!j.ok)throw new Error(j.error||'the script failed. Redeploy it with the newest script.');
+    }else await ssPost('/applications/'+c.table+'/records/'+rid+'/',{[c.fArea]:val},'PATCH');
+    w.status='Moved '+(nm||'person')+' to '+area+' in SmartSuite.';
+  }catch(e){if(w.srv)item.area=old;else item[c.fArea]=old0;w.status='Move failed, put back: '+e.message}
+  renderWhere();
+}
+async function wsExit(rid,hhmm_){
+  const c=ssCfg(),w=U.ws,item=w.srv?w.srv.find(p=>p.rid===rid):null,rec=w.srv?null:w.recs.find(r=>r.id===rid);
+  if(!item&&!rec){return}
+  const t0=item?item.t:recTime(rec),m=/^(\d{1,2}):(\d{2})/.exec(hhmm_||'');if(!m){toast('Pick an exit time first.');return}
+  let d=new Date();d.setHours(+m[1],+m[2],0,0);if(t0&&d.getTime()<t0)d=new Date(d.getTime()+864e5);
+  const pp=wsPeople().find(p=>p.rid===rid)||{},nmx=pp.name||'',arx=pp.area||'',outISO=d.toISOString(),inISO=t0?new Date(t0).toISOString():'';
+  const prev=item?{st:item.st,out:item.out}:{status:rec.status,due:rec.due_date};
+  if(item){item.st='complete';item.out=outISO}else{rec.status={value:'complete'};rec.due_date={from_date:inISO?{date:inISO,include_time:true}:null,to_date:{date:outISO,include_time:true}}}
+  w.status='Saving exit time…';renderWhere();
+  try{
+    if(c.sheet){
+      const r=await fetch(c.sheet+(c.sheet.includes('?')?'&':'?')+'action=exit&rid='+encodeURIComponent(rid)+'&in='+encodeURIComponent(inISO)+'&out='+encodeURIComponent(outISO)+'&name='+encodeURIComponent(nmx)+'&area='+encodeURIComponent(arx)+'&t='+Date.now(),{cache:'no-store'});
+      const j=JSON.parse(await r.text());if(!j.ok)throw new Error(j.error||'the script failed. Redeploy it with the newest script.');
+    }else await ssPost('/applications/'+c.table+'/records/'+rid+'/',{status:{value:'complete'},due_date:{from_date:inISO?{date:inISO,include_time:true}:null,to_date:{date:outISO,include_time:true}}},'PATCH');
+    w.status='Exit time '+fmtMin(d.getHours()*60+d.getMinutes())+' saved to SmartSuite.';
+  }catch(e){if(item){item.st=prev.st;item.out=prev.out}else{rec.status=prev.status;rec.due_date=prev.due}w.status='Exit not saved, put back: '+e.message}
+  renderWhere();
+}
+function wsView(){
+  const c=ssCfg(),w=U.ws;let h='';
+  h+=`<div class="bar"><label>Sign-ins from<select id="wHrs">${[['8','last 8 hours'],['12','last 12 hours'],['18','last 18 hours'],['24','last 24 hours'],['today','today since 12 AM']].map(([v,l])=>`<option value="${v}" ${c.hrs===v?'selected':''}>${l}</option>`).join('')}</select></label><label class="ck" style="flex-direction:row;align-items:center;gap:6px;text-transform:none;letter-spacing:0;font-size:13px"><input type="checkbox" id="wHide" ${c.hide?'checked':''}> Hide people who exited (Complete)</label><label class="ck" style="flex-direction:row;align-items:center;gap:6px;text-transform:none;letter-spacing:0;font-size:13px"><input type="checkbox" id="wAuto" ${c.auto?'checked':''}> Auto-refresh every 2 min</label><input id="wQ" placeholder="Search name" value="${esc(w.q)}" style="padding:6px 10px;border:1px solid var(--line);border-radius:6px;background:var(--soft);color:var(--ink)"><div class="sp"></div><button class="pri" id="wSync">${w.loading?'Syncing…':'Sync SmartSuite'}</button><button id="wSet">Settings</button></div>`;
+  if(w.open)h+=`<div class="bar" style="flex-direction:column;align-items:stretch"><div class="maps">${[['acct','Account ID'],['token','API token'],['table','Sign-in log table ID'],['names','Names table ID (linked NAME)'],['fName','NAME field id'],['fArea','AREA field id'],['proxy','Apps Script proxy URL (optional)'],['sheet','Google Sheet web app URL (does the SmartSuite pull and writes the sheet)']].map(([k,l])=>`<label>${l}<input data-ss="${k}" value="${esc(c[k])}" ${k==='token'?'type="password"':''}></label>`).join('')}</div><div style="display:flex;gap:8px;flex-wrap:wrap"><button id="wCopy">Copy proxy script</button><button id="wCopyS">Copy Google Sheet script</button><span class="empty" style="padding:6px 0;font-size:12px">Only use the proxy if the browser blocks the direct connection. The token is stored in this browser and is built into the file you were sent, so only share the file with people who should have it.</span></div></div>`;
+  if(w.status)h+=`<div class="empty" style="padding:6px 0;font-weight:600">${esc(w.status)}</div>`;
+  if(!w.at&&!w.loading&&!w.status)h+=`<div class="empty">Press Sync SmartSuite to pull the sign-in log.</div>`;
+  if(w.at){
+    const q=w.q.toLowerCase(),P=wsPeople().filter(p=>!q||p.name.toLowerCase().includes(q)),areas={};
+    P.forEach(p=>(areas[p.area]=areas[p.area]||[]).push(p));
+    const order=Object.values(SS_AREAS),keys=Object.keys(areas).sort((a,b)=>{const ia=order.indexOf(a),ib=order.indexOf(b);return (ia<0?99:ia)-(ib<0?99:ib)||a.localeCompare(b)});
+    const shown=order.filter(a=>!areas[a]).length&&!q?order:[];
+    const all=[...new Set([...order,...keys])].filter(a=>!q||areas[a]);
+    h+=`<div class="kpis"><div class="kpi"><div class="l">People signed in</div><div class="v">${P.length}</div><div class="s">updated ${hhmm(w.at)}</div></div>${order.slice(0,0).join('')}${all.slice(0,5).map(a=>`<div class="kpi"><div class="l">${esc(a)}</div><div class="v">${(areas[a]||[]).length}</div><div class="s">in area</div></div>`).join('')}</div>`;
+    h+=`<div class="wgrid">${all.map(a=>{const L=(areas[a]||[]).sort((x,y)=>x.name.localeCompare(y.name));return `<div class="wcard" data-area="${esc(a)}"><div class="wh"><b>${esc(a)}</b><span>${L.length}</span></div>${L.length?`<ul>${L.map(p=>`<li draggable="${p.rid?'true':'false'}" data-rid="${esc(p.rid||'')}"><span class="nm">${esc(p.name)}</span><small>${p.t?new Date(p.t).toLocaleTimeString([],{hour:'numeric',minute:'2-digit'}):''}</small>${p.rid&&!p.out?`<span class="ex"><input type="time" class="xt" data-xt="${esc(p.rid)}" value="${new Date().toTimeString().slice(0,5)}"><button class="xb" data-xb="${esc(p.rid)}">Exit</button></span>`:''}${p.out?`<small style="flex-basis:100%">out ${new Date(p.out).toLocaleTimeString([],{hour:'numeric',minute:'2-digit'})}</small>`:''}${p.rid?`<select class="mv" data-mv="${esc(p.rid)}" title="Move to another area"><option value="">Move…</option>${order.filter(x=>x!==a).map(x=>`<option>${esc(x)}</option>`).join('')}</select>`:''}</li>`).join('')}</ul>`:'<div class="empty" style="padding:4px 0">Nobody</div>'}</div>`}).join('')}</div>`;
+  }
+  return h;
+}
+
+// ===== Schedule: SmartSuite Roster -> scheduled counts per shift per day =====
+const SCH_GS="// LAX Schedule: reads the SmartSuite Roster (server side) and saves the schedule counts to this sheet.\n// Paste into a NEW Google Sheet: Extensions > Apps Script, then Deploy > New deployment > Web app\n// (Execute as: Me, Who has access: Anyone). Paste the /exec URL into the Schedule tab > Settings > Google Sheet web app URL.\nvar TOKEN = '__TOKEN__', ACCOUNT = '__ACCOUNT__', ROSTER = '6ace470e2bae617c790f8a18', HIRES = '6ace4ac27e99fb96b3a8dc5e', CONF = '6ace47022bae617c790f613c';\nfunction json_(o) { return ContentService.createTextOutput(JSON.stringify(o)).setMimeType(ContentService.MimeType.JSON); }\nfunction tab_(n) { var ss = SpreadsheetApp.getActiveSpreadsheet(); return ss.getSheetByName(n) || ss.insertSheet(n); }\nfunction list_(offset, app) {\n  var r = UrlFetchApp.fetch('https://app.smartsuite.com/api/v1/applications/' + (app || ROSTER) + '/records/list/?limit=1000&offset=' + offset, {\n    method: 'post', contentType: 'application/json', muteHttpExceptions: true,\n    headers: { 'Authorization': 'Token ' + TOKEN, 'ACCOUNT-ID': ACCOUNT }, payload: JSON.stringify({ hydrated: true })\n  });\n  if (r.getResponseCode() >= 300) throw new Error('SmartSuite said ' + r.getResponseCode() + ': ' + r.getContentText().slice(0, 200));\n  return JSON.parse(r.getContentText()).items || [];\n}\nfunction roster_() {\n  var out = [], offset = 0;\n  for (var i = 0; i \u003c 30; i++) {\n    var items = list_(offset);\n    items.forEach(function (r) { out.push({ t: r.title || '', n: r.s858e19ec2 && r.s858e19ec2.sys_root || '', s: r.s15f5f0025, d: r.sc0ee8c2c3, p: r.s8d04e4e61, o: r.s7e0cfc63f, c: r.sa74fabcec, w: r.s8eb4a549d }); });\n    if (items.length \u003c 1000) break;\n    offset += items.length;\n  }\n  return out;\n}\nfunction hires_() {\n  var out = [], offset = 0;\n  for (var i = 0; i \u003c 30; i++) {\n    var items = list_(offset, HIRES);\n    items.forEach(function (r) { out.push({ t: r.title || '', n: r.s858e19ec2 && r.s858e19ec2.sys_root || '', st: r.status, s: r.s15f5f0025, d: r.sc0ee8c2c3, p: r.s8d04e4e61, dt: r.s6cc1d1132, tm: r.s9baacc32b, oc: r.se5f93b889, nt: r.s42a278922 }); });\n    if (items.length \u003c 1000) break;\n    offset += items.length;\n  }\n  return out;\n}\nfunction conf_() {\n  var st = JSON.parse(UrlFetchApp.fetch('https://app.smartsuite.com/api/v1/applications/' + CONF + '/', { headers: { 'Authorization': 'Token ' + TOKEN, 'ACCOUNT-ID': ACCOUNT }, muteHttpExceptions: true }).getContentText());\n  var fields = (st.structure || []).map(function (f) { return { slug: f.slug, label: f.label, type: f.field_type, choices: ((f.params && f.params.choices) || []).map(function (x) { return { value: x.value, label: x.label }; }) }; });\n  var keep = /^(datefield|duedatefield|yesnofield|singleselectfield|statusfield)$/, items = [], offset = 0;\n  for (var i = 0; i \u003c 30; i++) {\n    var page = list_(offset, CONF);\n    page.forEach(function (r) { var o = { id: r.id, title: r.title }; fields.forEach(function (f) { if (keep.test(f.type)) o[f.slug] = r[f.slug]; }); items.push(o); });\n    if (page.length \u003c 1000) break;\n    offset += page.length;\n  }\n  return { fields: fields, items: items };\n}\nfunction doGet(e) {\n  try {\n    if (e && e.parameter && e.parameter.what === 'conf') { var c = conf_(); return json_({ ok: true, fields: c.fields, items: c.items }); }\n    if (e && e.parameter && e.parameter.what === 'hires') return json_({ ok: true, hires: hires_() });\n    return json_({ ok: true, people: roster_() });\n  } catch (err) { return json_({ ok: false, error: String(err) }); }\n}\nfunction put_(name, rows) {\n  var s = tab_(name); s.clear();\n  if (rows.length) s.getRange(1, 1, rows.length, rows[0].length).setNumberFormat('@').setValues(rows);\n  s.getRange(1, 1, 1, rows[0].length).setFontWeight('bold'); s.setFrozenRows(1);\n}\nfunction doPost(e) {\n  var lock = LockService.getScriptLock(); lock.waitLock(30000);\n  try {\n    var b = JSON.parse(e.postData.contents);\n    if (b.kind === 'conf') {\n      put_('Confirmations', [['Date', 'Scheduled', 'Confirmed (yes)', 'Callouts (no)', 'Confirmed %']].concat(b.rows));\n      return json_({ ok: true, rows: b.rows.length });\n    }\n    if (b.kind === 'hires') {\n      put_('New Hires', [['Name', 'Start date', 'Start time', 'Shift', 'Department', 'Position', 'Status', 'On clock', 'Notes']].concat(b.rows));\n      put_('Show-Up', [['Start date', 'Scheduled', 'Arrived', 'No show', 'Rescheduled', 'Still pending', 'Show-up %']].concat(b.summary));\n      return json_({ ok: true, hires: b.rows.length });\n    }\n    // Schedule: one row per shift, scheduled count for each day of the week\n    put_('Schedule', [['Synced at', b.at, '', '', '', '', '', '', '', ''], b.head].concat(b.matrix));\n    tab_('Schedule').getRange(2, 1, 1, b.head.length).setFontWeight('bold');\n    tab_('Schedule').getRange(1, 1, 1, 2).setFontWeight('normal');\n    // Roster: everyone with shift, department and days off\n    put_('Roster', [['Name', 'Shift', 'Department', 'Position', 'Days off', 'Confirmed']].concat(b.people));\n    // History: appended once per save\n    var h = tab_('History');\n    if (h.getLastRow() === 0) { h.getRange(1, 1, 1, b.head.length + 2).setValues([['Synced at', 'Group'].concat(b.head.slice(1))]).setFontWeight('bold'); h.setFrozenRows(1); }\n    if (b.matrix.length) h.getRange(h.getLastRow() + 1, 1, b.matrix.length, b.head.length + 1).setValues(b.matrix.map(function (r) { return [b.at].concat(r); }));\n    return json_({ ok: true, people: b.people.length });\n  } catch (err) { return json_({ ok: false, error: String(err) }); }\n  finally { lock.releaseLock(); }\n}\n";
+const SCH_TABLE='6ace470e2bae617c790f8a18';
+const SCH_SHIFT={o7E3J:'1st',w04P0:'2nd',g47tO:'3rd',zfrjD:'DNR',L7PHs:'INACTIVE',OnGUB:'OPENING SHIFT',VtMaO:'MID SHIFT'};
+const SCH_DEPT={w7H99:'GENERAL',"66TJM":'FORKLIFT','6CXHG':'LEAD',Hqxka:'ONSITE',oD5Rh:'LABELER'};
+const SCH_DAY={UgsN7:'SUNDAY',viqDW:'MONDAY',aK629:'TUESDAY',sAwLp:'WEDNESDAY',EpRN6:'THURSDAY','9uTx0':'FRIDAY',GnUls:'SATURDAY'};
+const SCH_DAYS=['SUNDAY','MONDAY','TUESDAY','WEDNESDAY','THURSDAY','FRIDAY','SATURDAY'],SCH_D3=['Sun','Mon','Tue','Wed','Thu','Fri','Sat'];
+const SCH_SHIFTS=['OPENING SHIFT','1st','MID SHIFT','2nd','3rd'];
+const SCH_AMPM_DEF={'OPENING SHIFT':'AM','1st':'AM','MID SHIFT':'AM','2nd':'PM','3rd':'PM'};
+U.sch={people:[],at:0,status:'',loading:false,open:false,shift:'',dept:''};
+const schCfg=()=>{let c={};try{c=JSON.parse(localStorage.getItem('lax_sch')||'{}')}catch(e){}return Object.assign({url:SCH_DEFAULT,ampm:{}},c)};
+const schSet=(k,v)=>{let c={};try{c=JSON.parse(localStorage.getItem('lax_sch')||'{}')}catch(e){}c[k]=v;try{localStorage.setItem('lax_sch',JSON.stringify(c))}catch(e){}};
+const SCH_DEFAULT='';
+function schLab(v,map){if(v==null||v==='')return'';if(typeof v==='object'&&!Array.isArray(v))return String(v.label||map[v.value]||v.value||'').trim().toUpperCase()===''?'':String(v.label||map[v.value]||v.value).trim();return String(map[v]||v).trim()}
+function schNorm(r){
+  const raw=JSON.stringify(r.o==null?'':r.o),up=raw.toUpperCase(),off=SCH_DAYS.filter(d=>up.includes(d)||raw.includes(Object.keys(SCH_DAY).find(k=>SCH_DAY[k]===d)));
+  return {name:(r.n||r.t||'').replace(/\s*-\s*$/,'').trim(),shift:schLab(r.s,SCH_SHIFT),dept:schLab(r.d,SCH_DEPT),pos:schLab(r.p,{}),off,conf:!!r.c,worked:!!r.w};
+}
+async function schLoad(save){
+  const c=schCfg(),s=U.sch;if(s.loading)return;s.loading=true;s.status='Syncing with SmartSuite…';if(U.sec==='schedule')renderSchedule();
+  try{
+    let items;
+    if(c.url){
+      const r=await fetch(c.url+(c.url.includes('?')?'&':'?')+'t='+Date.now(),{cache:'no-store'});
+      let j;try{j=JSON.parse(await r.text())}catch(e){throw new Error('The Google Sheet script did not answer. Deploy it as a Web app open to Anyone, using the newest Schedule script.')}
+      if(!j.ok)throw new Error(j.error||'the script failed');items=j.people;
+    }else{
+      const recs=await ssAll(SCH_TABLE,{});
+      items=recs.map(r=>({t:r.title,n:r.s858e19ec2&&r.s858e19ec2.sys_root,s:r.s15f5f0025,d:r.sc0ee8c2c3,p:r.s8d04e4e61,o:r.s7e0cfc63f,c:r.sa74fabcec}));
+    }
+    try{s.hires=await hireFetch();s.hireErr=''}catch(e){s.hireErr='New hires not loaded: '+e.message}
+    try{s.conf=await confFetch();s.confErr=''}catch(e){s.confErr='Confirmations not loaded: '+e.message}
+    s.people=items.map(schNorm);s.at=Date.now();s.status='Synced '+s.people.length+' people from SmartSuite at '+hhmm(Date.now())+'.';
+    if(save){
+      if(!c.url)s.status+=' Add the Google Sheet web app URL in Settings to save it.';
+      else{if(s.hires){try{s.status+=await hireSave()}catch(e){s.status+=' New hires not saved: '+e.message}}
+        if(s.conf){try{s.status+=await confSave()}catch(e){s.status+=' Confirmations not saved: '+e.message}}
+        const M=schMatrix(),r=await fetch(c.url,{method:'POST',headers:{'Content-Type':'text/plain;charset=utf-8'},body:JSON.stringify({at:new Date().toLocaleString([],{month:'numeric',day:'numeric',year:'numeric',hour:'numeric',minute:'2-digit'}),head:['Shift','Active',...SCH_D3],matrix:M.rows.map(x=>[x.label,x.active,...x.days]),people:s.people.map(p=>[p.name,p.shift,p.dept,p.pos,p.off.join(', '),p.conf?'Yes':'No'])})});
+        const j=JSON.parse(await r.text());if(!j.ok)throw new Error(j.error||'the sheet rejected it');s.status+=' Saved to the Google Sheet.'}
+    }
+  }catch(e){s.status='Not synced: '+e.message}
+  s.loading=false;if(U.sec==='schedule')renderSchedule();else if(U.sec==='attendance')render();
+}
+const schIsAct=p=>p.shift&&!/^(INACTIVE|DNR)$/i.test(p.shift);
+function schMatrix(){
+  const s=U.sch,c=schCfg(),ap=Object.assign({},SCH_AMPM_DEF,c.ampm||{});
+  let P=s.people;if(s.dept)P=P.filter(p=>p.dept===s.dept);
+  const act=P.filter(schIsAct),shifts=[...SCH_SHIFTS,...[...new Set(act.map(p=>p.shift))].filter(x=>!SCH_SHIFTS.includes(x))];
+  const row=(label,list)=>({label,active:list.length,days:SCH_DAYS.map(d=>list.filter(p=>!p.off.includes(d)).length)});
+  const rows=shifts.filter(sh=>!s.shift||sh===s.shift).map(sh=>row(sh,act.filter(p=>p.shift===sh))).filter(r=>r.active>0||SCH_SHIFTS.includes(r.label));
+  const am=act.filter(p=>ap[p.shift]==='AM'&&(!s.shift||p.shift===s.shift)),pm=act.filter(p=>ap[p.shift]==='PM'&&(!s.shift||p.shift===s.shift));
+  const all=act.filter(p=>!s.shift||p.shift===s.shift);
+  return {rows,am:row('AM',am),pm:row('PM',pm),all:row('TOTAL',all),inactive:P.filter(p=>/^INACTIVE$/i.test(p.shift)).length,dnr:P.filter(p=>/^DNR$/i.test(p.shift)).length,noShift:P.filter(p=>!p.shift).length,depts:[...new Set(s.people.map(p=>p.dept).filter(Boolean))].sort()};
+}
+
+// ===== New hires: scheduled vs arrived vs no-show =====
+const HIRE_TABLE='6ace4ac27e99fb96b3a8dc5e';
+const HIRE_ST={backlog:'SCHEDULED TO START',in_progress:'NO SHOW',ready_for_review:'RESCHEDULED',complete:'ARRIVED'};
+const HIRE_SH={o7E3J:'1st',w04P0:'2nd',ddbCM:'3rd'};
+function hireDate(v){if(!v)return'';if(typeof v==='string')return v.slice(0,10);if(v.date)return String(v.date).slice(0,10);const f=v.from_date||v.to_date;return f&&f.date?String(f.date).slice(0,10):''}
+function hireTime(v){const m=String(v||'').match(/^(\d{1,2}):(\d{2})/);if(!m)return'';const h=+m[1];return (h%12||12)+':'+m[2]+(h<12?' AM':' PM')}
+function hireNorm(r){
+  const sv=r.st&&typeof r.st==='object'?(r.st.value||''):String(r.st||'');
+  return {name:(r.n||r.t||'').trim(),status:HIRE_ST[sv]||String(r.st&&r.st.label||sv||'').toUpperCase(),shift:schLab(r.s,HIRE_SH),dept:schLab(r.d,SCH_DEPT),pos:schLab(r.p,{}),date:hireDate(r.dt),time:hireTime(r.tm),oc:!!r.oc,notes:r.nt||''};
+}
+async function hireFetch(){
+  const c=schCfg();let items;
+  if(c.url){
+    const r=await fetch(c.url+(c.url.includes('?')?'&':'?')+'what=hires&t='+Date.now(),{cache:'no-store'});
+    let j;try{j=JSON.parse(await r.text())}catch(e){throw new Error('The Google Sheet script did not answer.')}
+    if(!j.ok)throw new Error(j.error||'the script failed');
+    if(!j.hires)throw new Error('The Google Sheet script is the old version. Paste the newest Schedule script and deploy a New version.');items=j.hires;
+  }else{
+    const recs=await ssAll(HIRE_TABLE,{});
+    items=recs.map(r=>({t:r.title,n:r.s858e19ec2&&r.s858e19ec2.sys_root,st:r.status,s:r.s15f5f0025,d:r.sc0ee8c2c3,p:r.s8d04e4e61,dt:r.s6cc1d1132,tm:r.s9baacc32b,oc:r.se5f93b889,nt:r.s42a278922}));
+  }
+  return items.map(hireNorm).filter(x=>x.date);
+}
+const hireCnt=L=>{const c={sch:0,arr:0,ns:0,re:0,pend:0};L.forEach(h=>{if(h.status==='ARRIVED')c.arr++;else if(h.status==='NO SHOW')c.ns++;else if(h.status==='RESCHEDULED')c.re++;else c.pend++});c.sch=c.arr+c.ns+c.pend;c.dec=c.arr+c.ns;c.pct=c.dec?Math.round(c.arr/c.dec*100):null;return c};
+function hireSummaryRows(){
+  const by={};(U.sch.hires||[]).forEach(h=>(by[h.date]=by[h.date]||[]).push(h));
+  return Object.keys(by).sort().map(d=>{const c=hireCnt(by[d]);return [d,c.sch,c.arr,c.ns,c.re,c.pend,c.pct==null?'':c.pct+'%']});
+}
+async function hireSave(){
+  const c=schCfg();if(!c.url)return' Add the Google Sheet web app URL in Settings to save new hires.';
+  const rows=(U.sch.hires||[]).slice().sort((a,b)=>a.date<b.date?-1:a.date>b.date?1:a.name.localeCompare(b.name)).map(h=>[h.name,h.date,h.time,h.shift,h.dept,h.pos,h.status,h.oc?'Yes':'No',h.notes]);
+  const r=await fetch(c.url,{method:'POST',headers:{'Content-Type':'text/plain;charset=utf-8'},body:JSON.stringify({kind:'hires',rows,summary:hireSummaryRows()})});
+  const j=JSON.parse(await r.text());if(!j.ok)throw new Error(j.error||'the sheet rejected it');return' Saved '+rows.length+' new hires to the Google Sheet.';
+}
+function hireView(){
+  const s=U.sch,H=s.hires;
+  if(!H)return `<h3 style="margin-top:22px">New hires · scheduled vs showed</h3><div class="empty">${s.hireErr?esc(s.hireErr):'Loading new hires…'}</div>`;
+  const td=new Date(),iso=d=>d2iso(d),sh=n=>{const d=new Date();d.setDate(d.getDate()+n);return iso(d)};
+  if(!s.hFrom)s.hFrom=sh(-13);if(!s.hTo)s.hTo=sh(7);
+  let L=H.filter(h=>h.date>=s.hFrom&&h.date<=s.hTo);
+  if(s.hShift)L=L.filter(h=>h.shift===s.hShift);if(s.hDept)L=L.filter(h=>h.dept===s.hDept);
+  const T=hireCnt(L),days=[...new Set(L.map(h=>h.date))].sort(),by=d=>hireCnt(L.filter(h=>h.date===d));
+  const mx=Math.max(1,...days.map(d=>{const c=by(d);return c.sch+c.re}));
+  const card=(l,v,bg)=>`<div class="sc" style="background:${bg}"><div class="l">${l}</div><div class="v">${v}</div></div>`;
+  let h=`<h3 style="margin-top:22px">New hires · scheduled vs showed</h3>
+   <div class="row"><label class="ck">From <input type="date" id="hFrom" value="${s.hFrom}"></label><label class="ck">To <input type="date" id="hTo" value="${s.hTo}"></label>
+   <label class="ck">Shift <select id="hShift"><option value="">All</option>${['1st','2nd','3rd'].map(x=>`<option ${s.hShift===x?'selected':''}>${x}</option>`).join('')}</select></label>
+   <label class="ck">Department <select id="hDept"><option value="">All</option>${[...new Set(H.map(x=>x.dept).filter(Boolean))].sort().map(x=>`<option ${s.hDept===x?'selected':''}>${esc(x)}</option>`).join('')}</select></label></div>
+   <div class="sgrid" style="grid-template-columns:repeat(3,minmax(0,1fr))">${card('SCHEDULED',T.sch,'#3a86ff')}${card('SHOWED',T.arr,'#3eac40')}${card('NO SHOWS',T.ns,'#f1273f')}${card('SHOW-UP %',T.pct==null?'–':T.pct+'%','#0b5d54')}${card('STILL PENDING',T.pend,'#6a849b')}${card('RESCHEDULED',T.re,'#ff9210')}</div>`;
+  if(!L.length)return h+`<div class="empty">No new hires start between those dates.</div>`;
+  const dl=d=>{const x=iso2d(d);return D3[(x.getDay()+6)%7]+' '+(x.getMonth()+1)+'/'+x.getDate()};
+  h+=`<div class="panel" style="border-radius:10px;border-top:1px solid var(--line);margin:10px 0"><div class="ttl"><h2>By start date</h2><span class="m"><i class="dot" style="background:#3eac40"></i>Showed <i class="dot" style="background:#f1273f"></i>No show <i class="dot" style="background:#6a849b"></i>Pending <i class="dot" style="background:#ff9210"></i>Rescheduled</span></div>
+   <div class="schart" style="height:200px">${days.map(d=>{const c=by(d),tot=c.sch+c.re,seg=(n,col)=>n?`<i style="height:${n/tot*100}%;background:${col}"></i>`:'';return `<div class="sb"><div class="sbv">${c.pct==null?'':c.pct+'%'}</div><div class="sbar" style="height:${Math.round(tot/mx*100)}%;background:none;flex-direction:column-reverse">${seg(c.arr,'#3eac40')}${seg(c.ns,'#f1273f')}${seg(c.pend,'#6a849b')}${seg(c.re,'#ff9210')}</div><div class="sbl">${dl(d)}</div></div>`}).join('')}</div>
+   <div class="scroll"><table class="rt"><thead><tr><th class="p">Start date</th><th>Scheduled</th><th>Showed</th><th>No show</th><th>Pending</th><th>Rescheduled</th><th>Show-up %</th></tr></thead><tbody>
+   ${days.map(d=>{const c=by(d);return `<tr><td class="p">${dl(d)}</td><td>${c.sch}</td><td>${c.arr}</td><td>${c.ns}</td><td>${c.pend||'–'}</td><td>${c.re||'–'}</td><td><b>${c.pct==null?'–':c.pct+'%'}</b></td></tr>`}).join('')}
+   <tr class="tot"><td class="p">TOTAL</td><td>${T.sch}</td><td>${T.arr}</td><td>${T.ns}</td><td>${T.pend}</td><td>${T.re}</td><td>${T.pct==null?'–':T.pct+'%'}</td></tr></tbody></table></div>
+   <div class="empty" style="font-size:12px;padding:6px 0">Scheduled = showed + no show + still pending (rescheduled people are listed but not counted). Show-up % = showed ÷ (showed + no shows), so people who have not started yet do not hurt it.</div></div>`;
+  const ns=L.filter(x=>x.status==='NO SHOW').sort((a,b)=>a.date<b.date?1:-1);
+  if(ns.length)h+=`<h3>No shows</h3><div class="scroll"><table class="rt"><thead><tr><th class="p">Name</th><th>Start date</th><th>Shift</th><th>Department</th><th>Notes</th></tr></thead><tbody>${ns.map(x=>`<tr><td class="p">${esc(x.name)}</td><td>${mdy(x.date)}</td><td>${esc(x.shift)}</td><td>${esc(x.dept)}</td><td style="text-align:left">${esc(x.notes)}</td></tr>`).join('')}</tbody></table></div>`;
+  return h;
+}
+
+// ===== Confirmations (yes) vs callouts (no), by date, from the SmartSuite Conformations table =====
+const CONF_TABLE='6ace47022bae617c790f613c';
+async function confFetch(){
+  const c=schCfg();let fields,items;
+  if(c.url){
+    const r=await fetch(c.url+(c.url.includes('?')?'&':'?')+'what=conf&t='+Date.now(),{cache:'no-store'});
+    let j;try{j=JSON.parse(await r.text())}catch(e){throw new Error('The Google Sheet script did not answer.')}
+    if(!j.ok)throw new Error(j.error||'the script failed');
+    if(!j.fields)throw new Error('The Google Sheet script is the old version. Paste the newest Schedule script and deploy a New version.');
+    fields=j.fields;items=j.items;
+  }else{
+    const st=await ssPost('/applications/'+CONF_TABLE+'/',{},'GET');
+    fields=(st.structure||[]).map(f=>({slug:f.slug,label:f.label,type:f.field_type,choices:(f.params&&f.params.choices||[]).map(x=>({value:x.value,label:x.label}))}));
+    items=(await ssAll(CONF_TABLE,{})).map(r=>{const o={id:r.id,title:r.title};fields.forEach(f=>{if(CONF_KEEP.test(f.type))o[f.slug]=r[f.slug]});return o});
+  }
+  return {fields,items};
+}
+const CONF_KEEP=/^(datefield|duedatefield|yesnofield|singleselectfield|statusfield)$/;
+function confPick(){
+  const s=U.sch,C=s.conf;if(!C)return null;const F=C.fields,pick=(types,re,saved)=>{const L=F.filter(f=>types.includes(f.type));return L.find(f=>f.slug===saved)||L.find(f=>re.test(f.label))||L[0]||null};
+  const cfg=schCfg();
+  return {date:pick(['datefield','duedatefield'],/date/i,cfg.cfDate),yes:pick(['yesnofield'],/confirm|conform/i,cfg.cfYes),shift:F.find(f=>f.type==='singleselectfield'&&/shift/i.test(f.label))||null,dates:F.filter(f=>['datefield','duedatefield'].includes(f.type)),yesnos:F.filter(f=>f.type==='yesnofield')};
+}
+function confDate(v){if(!v)return'';if(typeof v==='string')return v.slice(0,10);if(v.date)return String(v.date).slice(0,10);const f=v.from_date||v.to_date;return f&&f.date?String(f.date).slice(0,10):''}
+function confLabel(v,f){if(v==null||v==='')return'';if(typeof v==='object')return String(v.label||v.value||'');const c=(f&&f.choices||[]).find(x=>x.value===v);return String(c?c.label:v)}
+function confData(){
+  const P=confPick();if(!P||!P.date||!P.yes)return null;const s=U.sch,sh=s.cShift||'';
+  const rows=s.conf.items.map(r=>({date:confDate(r[P.date.slug]),yes:r[P.yes.slug]===true||r[P.yes.slug]==='true',shift:P.shift?confLabel(r[P.shift.slug],P.shift):''})).filter(r=>r.date);
+  const dd=new Date(),iso=n=>{const d=new Date();d.setDate(d.getDate()+n);return d2iso(d)};
+  if(!s.cFrom)s.cFrom=iso(-13);if(!s.cTo)s.cTo=iso(7);
+  const shifts=[...new Set(rows.map(r=>r.shift).filter(Boolean))].sort();
+  const L=rows.filter(r=>r.date>=s.cFrom&&r.date<=s.cTo&&(!sh||r.shift===sh));
+  const cnt=A=>{const y=A.filter(r=>r.yes).length;return {sch:A.length,yes:y,no:A.length-y,pct:A.length?Math.round(y/A.length*100):null}};
+  const days=[...new Set(L.map(r=>r.date))].sort();
+  return {P,L,days,by:d=>cnt(L.filter(r=>r.date===d)),T:cnt(L),shifts,all:[...new Set(rows.map(r=>r.date))].sort().map(d=>[d,...(c=>[c.sch,c.yes,c.no,c.pct==null?'':c.pct+'%'])(cnt(rows.filter(r=>r.date===d)))])};
+}
+function confView(){
+  const s=U.sch;
+  if(!s.conf)return `<h3 style="margin-top:22px">Confirmations vs callouts · by date</h3><div class="empty">${s.confErr?esc(s.confErr):'Loading confirmations…'}</div>`;
+  const D=confData(),P=confPick();
+  let h=`<h3 style="margin-top:22px">Confirmations vs callouts · by date</h3>`;
+  const sel=(id,list,cur)=>`<select id="${id}">${list.map(f=>`<option value="${esc(f.slug)}" ${cur&&cur.slug===f.slug?'selected':''}>${esc(f.label)}</option>`).join('')}</select>`;
+  h+=`<div class="row"><label class="ck">Date field ${sel('cfDate',P.dates,P.date)}</label><label class="ck">Yes / No field ${sel('cfYes',P.yesnos,P.yes)}</label></div>`;
+  if(!D)return h+`<div class="empty">The Conformations table needs a date field and a yes/no field. Pick them above.</div>`;
+  const {T,days,by,L}=D,mx=Math.max(1,...days.map(d=>by(d).sch));
+  const card=(l,v,bg)=>`<div class="sc" style="background:${bg}"><div class="l">${l}</div><div class="v">${v}</div></div>`;
+  h+=`<div class="row"><label class="ck">From <input type="date" id="cFrom" value="${s.cFrom}"></label><label class="ck">To <input type="date" id="cTo" value="${s.cTo}"></label>${D.shifts.length?`<label class="ck">Shift <select id="cShift"><option value="">All</option>${D.shifts.map(x=>`<option ${s.cShift===x?'selected':''}>${esc(x)}</option>`).join('')}</select></label>`:''}</div>
+   <div class="sgrid">${card('SCHEDULED',T.sch,'#3a86ff')}${card('CONFIRMED (YES)',T.yes,'#3eac40')}${card('CALLOUTS (NO)',T.no,'#f1273f')}</div><div class="sgrid" style="grid-template-columns:1fr">${card('CONFIRMED %',T.pct==null?'–':T.pct+'%','#0b5d54')}</div>`;
+  if(!L.length)return h+`<div class="empty">No records fall between those dates.</div>`;
+  const dl=d=>{const x=iso2d(d);return D3[(x.getDay()+6)%7]+' '+(x.getMonth()+1)+'/'+x.getDate()};
+  h+=`<div class="panel" style="border-radius:10px;border-top:1px solid var(--line);margin:10px 0"><div class="ttl"><h2>By date</h2><span class="m"><i class="dot" style="background:#3eac40"></i>Confirmed <i class="dot" style="background:#f1273f"></i>Callout</span></div>
+   <div class="schart" style="height:190px">${days.map(d=>{const c=by(d);return `<div class="sb"><div class="sbv">${c.pct==null?'':c.pct+'%'}</div><div class="sbar" style="height:${Math.round(c.sch/mx*100)}%;background:none;flex-direction:column-reverse"><i style="height:${c.yes/c.sch*100}%;background:#3eac40"></i><i style="height:${c.no/c.sch*100}%;background:#f1273f"></i></div><div class="sbl">${dl(d)}</div></div>`}).join('')}</div>
+   <div class="scroll"><table class="rt"><thead><tr><th class="p">Date</th><th>Scheduled</th><th>Confirmed (yes)</th><th>Callouts (no)</th><th>Confirmed %</th></tr></thead><tbody>${days.map(d=>{const c=by(d);return `<tr><td class="p">${dl(d)}</td><td>${c.sch}</td><td>${c.yes}</td><td>${c.no}</td><td><b>${c.pct==null?'–':c.pct+'%'}</b></td></tr>`}).join('')}<tr class="tot"><td class="p">TOTAL</td><td>${T.sch}</td><td>${T.yes}</td><td>${T.no}</td><td>${T.pct==null?'–':T.pct+'%'}</td></tr></tbody></table></div>
+   <div class="empty" style="font-size:12px;padding:6px 0">Each record in the Conformations table counts once on its date. Yes = confirmed, No = callout.</div></div>`;
+  return h;
+}
+async function confSave(){
+  const c=schCfg();if(!c.url)return'';const D=confData();if(!D)return'';
+  const r=await fetch(c.url,{method:'POST',headers:{'Content-Type':'text/plain;charset=utf-8'},body:JSON.stringify({kind:'conf',rows:D.all})});
+  const j=JSON.parse(await r.text());if(!j.ok)throw new Error(j.error||'the sheet rejected it');return' Saved confirmations by date to the Google Sheet.';
+}
+function schView(){
+  const s=U.sch,c=schCfg();
+  let h=`<div class="bar"><button class="pri" id="sSync">${s.loading?'Syncing…':'Sync from SmartSuite'}</button><button id="sSave">Sync + save to Google Sheet</button><div class="sp"></div><button id="sSet">${s.open?'Hide settings':'Settings'}</button></div>`;
+  if(s.open)h+=`<div class="bar" style="flex-direction:column;align-items:stretch"><label>Google Sheet web app URL (saves the schedule counts)<input type="text" id="sUrl" value="${esc(c.url)}" placeholder="https://script.google.com/macros/s/…/exec" style="width:100%"></label>
+   <div class="row" style="flex-wrap:wrap">${SCH_SHIFTS.map(x=>`<label class="ck">${esc(x)} counts as <select data-sap="${esc(x)}"><option ${(c.ampm[x]||SCH_AMPM_DEF[x])==='AM'?'selected':''}>AM</option><option ${(c.ampm[x]||SCH_AMPM_DEF[x])==='PM'?'selected':''}>PM</option></select></label>`).join('')}</div>
+   <div class="row"><button id="sCopy">Copy the Google Sheet script</button><span class="m">Paste it in a new sheet: Extensions › Apps Script, then Deploy › Web app, access Anyone.</span></div></div>`;
+  if(s.status)h+=`<div class="empty" style="padding:6px 0;font-weight:600">${esc(s.status)}</div>`;
+  if(!s.people.length)return h+`<div class="panel empty" style="border-top:1px solid var(--line);border-radius:10px">${s.loading?'Loading the roster…':'Hit Sync from SmartSuite to load the roster.'}</div>`;
+  const M=schMatrix(),mx=Math.max(1,...M.all.days);
+  const card=(l,v,cl)=>`<div class="sc ${cl}"><div class="l">${esc(l)}</div><div class="v">${v}</div></div>`;
+  h+=`<div class="row"><label class="ck">Shift <select id="sShift"><option value="">All</option>${SCH_SHIFTS.map(x=>`<option ${s.shift===x?'selected':''}>${esc(x)}</option>`).join('')}</select></label><label class="ck">Department <select id="sDept"><option value="">All</option>${M.depts.map(x=>`<option ${s.dept===x?'selected':''}>${esc(x)}</option>`).join('')}</select></label></div>`;
+  h+=`<div class="sgrid">${card('AM ACTIVE',M.am.active,'t')}${card('PM ACTIVE',M.pm.active,'t')}${card('INACTIVE',M.inactive,'t')}${SCH_DAYS.map((d,i)=>card(d,M.all.days[i],'b')).join('')}</div>`;
+  const bars=SCH_DAYS.map((d,i)=>{const v=M.all.days[i];return `<div class="sb"><div class="sbv">${v}</div><div class="sbar" style="height:${Math.round(v/mx*100)}%"><i style="height:${v?M.am.days[i]/v*100:0}%;background:var(--early)"></i></div><div class="sbl">${SCH_D3[i]}</div></div>`}).join('');
+  h+=`<div class="panel" style="border-radius:10px;border-top:1px solid var(--line);margin:12px 0"><div class="ttl"><h2>Scheduled each day</h2><span class="m"><i class="dot" style="background:var(--early)"></i>AM <i class="dot" style="background:var(--reg)"></i>PM</span></div><div class="schart">${bars}</div>
+   <h3>By shift</h3><div class="scroll"><table class="rt"><thead><tr><th class="p">Shift</th><th>Active</th>${SCH_D3.map(d=>`<th>${d}</th>`).join('')}</tr></thead><tbody>
+   ${M.rows.map(r=>`<tr><td class="p">${esc(r.label)}</td><td>${r.active}</td>${r.days.map(v=>`<td>${v||'–'}</td>`).join('')}</tr>`).join('')}
+   <tr class="tot"><td class="p">AM</td><td>${M.am.active}</td>${M.am.days.map(v=>`<td>${v}</td>`).join('')}</tr><tr class="tot"><td class="p">PM</td><td>${M.pm.active}</td>${M.pm.days.map(v=>`<td>${v}</td>`).join('')}</tr>
+   <tr class="tot"><td class="p">TOTAL SCHEDULED</td><td>${M.all.active}</td>${M.all.days.map(v=>`<td>${v}</td>`).join('')}</tr></tbody></table></div>
+   <div class="empty" style="font-size:12px;padding:6px 0">Scheduled = active people (1st, 2nd, 3rd, Opening, Mid) who do not have that day in DAYS OFF. ${M.dnr?M.dnr+' DNR and ':''}${M.inactive} inactive${M.noShift?' and '+M.noShift+' with no shift set':''} are not counted.</div></div>`;
+  return h;
+}
+function renderSchedule(){
+  $('#app').innerHTML=`<div class="wrap"><div class="top"><div><div class="eyebrow">LAX Sorting Center · Lyneer</div><h1><span>Schedule</span></h1></div></div>${secNav()}${schView()}${U.sch.people.length||U.sch.conf||U.sch.confErr?confView():''}${U.sch.people.length||U.sch.hires?hireView():''}</div>`;
+  const on=(id,ev,fn)=>{const el=document.getElementById(id);if(el)el.addEventListener(ev,fn)};
+  on('cFrom','change',e=>{U.sch.cFrom=e.target.value;renderSchedule()});on('cTo','change',e=>{U.sch.cTo=e.target.value;renderSchedule()});on('cShift','change',e=>{U.sch.cShift=e.target.value;renderSchedule()});on('cfDate','change',e=>{schSet('cfDate',e.target.value);renderSchedule()});on('cfYes','change',e=>{schSet('cfYes',e.target.value);renderSchedule()});on('hFrom','change',e=>{U.sch.hFrom=e.target.value;renderSchedule()});on('hTo','change',e=>{U.sch.hTo=e.target.value;renderSchedule()});on('hShift','change',e=>{U.sch.hShift=e.target.value;renderSchedule()});on('hDept','change',e=>{U.sch.hDept=e.target.value;renderSchedule()});
+  on('sSync','click',()=>schLoad(false));on('sSave','click',()=>schLoad(true));on('sSet','click',()=>{U.sch.open=!U.sch.open;renderSchedule()});
+  on('sUrl','change',e=>schSet('url',e.target.value.trim()));
+  on('sShift','change',e=>{U.sch.shift=e.target.value;renderSchedule()});on('sDept','change',e=>{U.sch.dept=e.target.value;renderSchedule()});
+  document.querySelectorAll('[data-sap]').forEach(sel=>sel.addEventListener('change',()=>{const c=schCfg(),m=Object.assign({},c.ampm);m[sel.dataset.sap]=sel.value;schSet('ampm',m);renderSchedule()}));
+  on('sCopy','click',async()=>{const k=ssCfg();try{await navigator.clipboard.writeText(SCH_GS.replace('__TOKEN__',k.token).replace('__ACCOUNT__',k.acct));toast('Schedule script copied.')}catch(e){toast('Copy failed.')}});
+  if(!U.sch.people.length&&!U.sch.at&&!U.sch.loading&&!U.sch.tried){U.sch.tried=true;schLoad(false)}
+}
+function renderWhere(){
+  const keep=document.activeElement&&document.activeElement.id==='wQ';
+  $('#app').innerHTML=`<div class="wrap"><div class="top"><div><div class="eyebrow">LAX Sorting Center · Lyneer</div><h1>Who's <span>Where</span></h1></div></div>${secNav()}${wsView()}</div>`;
+  const on=(id,ev,fn)=>{const el=document.getElementById(id);if(el)el.addEventListener(ev,fn)};
+  on('wSync','click',()=>wsSync(true));on('wSet','click',()=>{U.ws.open=!U.ws.open;renderWhere()});
+  on('wHrs','change',e=>{ssSet('hrs',e.target.value);wsSync(false)});on('wHide','change',e=>{ssSet('hide',e.target.checked);renderWhere()});
+  on('wAuto','change',e=>{ssSet('auto',e.target.checked);wsTimer()});
+  on('wQ','input',e=>{U.ws.q=e.target.value;const p=e.target.selectionStart;renderWhere();const el=$('#wQ');if(el){el.focus();el.setSelectionRange(p,p)}});
+  document.querySelectorAll('[data-ss]').forEach(i=>i.addEventListener('change',()=>{ssSet(i.dataset.ss,i.value.trim())}));
+  document.querySelectorAll('[data-xb]').forEach(b=>b.addEventListener('click',()=>{const i=document.querySelector('[data-xt="'+b.dataset.xb+'"]');wsExit(b.dataset.xb,i&&i.value)}));
+  document.querySelectorAll('[data-mv]').forEach(sel=>sel.addEventListener('change',()=>{if(sel.value)wsMove(sel.dataset.mv,sel.value)}));
+  document.querySelectorAll('.wcard li[draggable="true"]').forEach(li=>li.addEventListener('dragstart',e=>{e.dataTransfer.setData('text/plain',li.dataset.rid);e.dataTransfer.effectAllowed='move'}));
+  document.querySelectorAll('.wcard').forEach(card=>{card.addEventListener('dragover',e=>{e.preventDefault();card.classList.add('over')});card.addEventListener('dragleave',()=>card.classList.remove('over'));card.addEventListener('drop',e=>{e.preventDefault();e.stopPropagation();card.classList.remove('over');const rid=e.dataTransfer.getData('text/plain');if(rid&&card.dataset.area)wsMove(rid,card.dataset.area)})});
+  on('wCopyS','click',async()=>{try{await navigator.clipboard.writeText(WW_GS);toast('Google Sheet script copied.')}catch(e){toast('Copy failed.')}});
+  on('wCopy','click',async()=>{const c=ssCfg(),t=SS_GS.replace('__TOKEN__',c.token).replace('__ACCOUNT__',c.acct);try{await navigator.clipboard.writeText(t);toast('Proxy script copied.')}catch(e){toast('Copy failed.')}});
+  if(U.ws.recs.length===0&&!U.ws.at&&!U.ws.loading&&!U.ws.tried){U.ws.tried=true;wsSync(false)}
+  wsTimer();
+}
+function wsTimer(){clearInterval(U.ws.timer);U.ws.timer=null;if(U.sec==='where'&&ssCfg().auto)U.ws.timer=setInterval(()=>{if(U.sec!=='where'){clearInterval(U.ws.timer);return}if(!document.activeElement||document.activeElement.tagName!=='INPUT')wsSync(false)},120000)}
+/* ---------- shared save: publish the data file next to the page (same way the TikTok report does) ---------- */
+const GS_CODE="// LAX Weekly Labor Request - Google Sheets backend\n// Paste into Extensions > Apps Script in the Google Sheet, then Deploy > New deployment > Web app\n// (Execute as: Me, Who has access: Anyone). Copy the Web app URL into the page's \"Google Sheet\" box.\n\nconst HEAD_ROWS = ['Week Start','Date','Day','#','Position','Opening HC','Opening Start','Early HC','Early Start','Mid HC','Mid Start','Regular HC','Regular Start','2nd Opening HC','2nd Opening Start','2nd Early HC','2nd Early Start','2nd Mid HC','2nd Mid Start','2nd Regular HC','2nd Regular Start','Total HC','Total Hours','Remarks'];\nconst HEAD_DAILY = ['Week Start','Date','Day','Total HC','Early HC','Regular HC','Total Hours'];\n\nfunction json_(o){return ContentService.createTextOutput(JSON.stringify(o)).setMimeType(ContentService.MimeType.JSON)}\nfunction sheet_(ss,name){return ss.getSheetByName(name)||ss.insertSheet(name)}\n\nfunction doGet(){\n  const sh = sheet_(SpreadsheetApp.getActiveSpreadsheet(),'_data');\n  const n = sh.getLastRow();\n  const txt = n ? sh.getRange(1,1,n,1).getValues().map(r=>r[0]).join('') : '';\n  return ContentService.createTextOutput(txt || '{}').setMimeType(ContentService.MimeType.JSON);\n}\n\nfunction doPost(e){\n  const lock = LockService.getScriptLock();\n  lock.waitLock(20000);\n  try{\n    const p = JSON.parse(e.postData.contents);\n    const ss = SpreadsheetApp.getActiveSpreadsheet();\n    const state = JSON.stringify({weeks:p.weeks, hours:p.hours, dr:p.dr, drMap:p.drMap, punchHC:p.punchHC, savedAt:p.savedAt});\n    const d = sheet_(ss,'_data'); d.clear();\n    const chunks = [];\n    for(let i=0;i\u003cstate.length;i+=40000) chunks.push([state.slice(i,i+40000)]);\n    d.getRange(1,1,chunks.length,1).setValues(chunks);\n    write_(sheet_(ss,'Requests'), HEAD_ROWS, p.rows||[]);\n    write_(sheet_(ss,'Daily Summary'), HEAD_DAILY, p.daily||[]);\n    return json_({ok:true, savedAt:p.savedAt});\n  }catch(err){\n    return json_({ok:false, error:String(err)});\n  }finally{\n    lock.releaseLock();\n  }\n}\n\nfunction write_(sh, head, rows){\n  sh.clear();\n  sh.getRange(1,1,1,head.length).setValues([head]).setFontWeight('bold').setBackground('#0b5d54').setFontColor('#ffffff');\n  if(rows.length) sh.getRange(2,1,rows.length,head.length).setValues(rows);\n  sh.setFrozenRows(1);\n  sh.autoResizeColumns(1, head.length);\n}\n";
+const SHEET_DEFAULT='https://script.google.com/macros/s/AKfycbzqlW2clMAczSwSL-PilzjGytdhbK8mBu7zTdtosbPmfPryLumBj6QnhIouV386JEeD/exec';
+let SHEET_URL=(()=>{try{return localStorage.getItem('lax_sheet_url')||SHEET_DEFAULT}catch(e){return SHEET_DEFAULT}})();
+const hhmm=t=>new Date(t).toLocaleTimeString([], {hour:'numeric',minute:'2-digit'});
+function payload(){const clean={weeks:{},hours:STATE.hours,dr:STATE.dr,drMap:STATE.drMap,punchHC:STATE.punchHC};weekKeys().forEach(k=>{clean.weeks[k]=STATE.weeks[k]});clean.weeks._extra={dr:STATE.dr,drMap:STATE.drMap,punchHC:STATE.punchHC};clean.savedAt=Date.now();return clean}
+function sheetPayload(legacy){
+  const p=payload(),rows=[],daily=[],H=STATE.hours;
+  weekKeys().forEach(k=>{const w=STATE.weeks[k];
+    for(let d=0;d<7;d++){const date=addDays(k,d),day=w.days[d]||{};
+      POS.forEach((name,i)=>{const r=day[i];if(!rowHas(r))return;
+        const T=rowHC(r),v=x=>r[x]===undefined?'':r[x],row=[k,date,D3[d],i+1,name];
+        [1,2].forEach(sh=>['o','e','m','r'].forEach(g=>{row.push(v(g+sh),r['t'+(g==='e'||g==='r'?g:g)+sh]||'')}));
+        if(legacy){
+          const H2=STATE.hours,E1=num(r.o1)+num(r.e1),E2=num(r.o2)+num(r.e2),eh=(E1+E2)*num(H2.early),rh=(num(r.r1)+num(r.r2)+num(r.m1)+num(r.m2))*num(H2.regular);
+          rows.push([k,date,D3[d],i+1,name,E1||'',r.te1||r.to1||'',(num(r.r1)+num(r.m1))||'',r.tr1||r.tm1||'',E2||'',r.te2||r.to2||'',(num(r.r2)+num(r.m2))||'',r.tr2||r.tm2||'',T,eh,rh,rowHrs(r),r.n||'']);
+        }else{row.push(T,rowHrs(r),r.n||'');rows.push(row)}
+      });
+      const t=dayHC(w,d),e=dayEarly(w,d);daily.push([k,date,D3[d],t,e,t-e,dayHrs(w,d)]);
+    }});
+  p.rows=rows;p.daily=daily;return p;
+}
+async function sheetGet(){const r=await fetch(SHEET_URL+(SHEET_URL.includes('?')?'&':'?')+'t='+Date.now(),{cache:'no-store'});if(!r.ok)throw new Error('HTTP '+r.status);const t=await r.text();try{return JSON.parse(t||'{}')}catch(e){throw new Error('That URL did not return sheet data. Check the Apps Script deployment is set to Anyone.')}}
+let gsTimer=null;
+async function save(){
+  U.err='';if(U.saving)return;U.saving=true;
+  const b=$('#btnSave');if(b){b.disabled=true;b.textContent='Saving…'}
+  const st=$('#stat');if(st){st.textContent='Saving…';st.className='stat dirty'}
+  try{
+    if(SHEET_URL){
+      const remote=await sheetGet();
+      if(!U.force&&remote.savedAt&&U.saved&&remote.savedAt!==U.saved){U.force=true;throw {code:'newer',message:'Someone saved to the sheet after you opened this. Press Save again to overwrite their version, or reload the page to get it.'}}
+      const post=async lg=>{const r=await fetch(SHEET_URL,{method:'POST',headers:{'Content-Type':'text/plain;charset=utf-8'},body:JSON.stringify(sheetPayload(lg))});return JSON.parse(await r.text())};
+      let j=await post(false),old=false;
+      if(!j.ok&&/number of columns/i.test(String(j.error||''))){j=await post(true);old=!!j.ok}
+      if(!j.ok)throw {code:'sheet',message:j.error||'the sheet rejected the save'};
+      if(old)toast('Saved. Paste the newest labor Apps Script and redeploy to get Opening columns in the Requests tab.');
+      U.dirty=false;U.force=false;U.saved=j.savedAt;toast('Saved to the Google Sheet. Everyone with the page link sees it.');
+    }else{
+    if(!U.art)U.art=await claude.use('artifact');
+    if(!U.art)throw {code:'unavailable',message:'this view cannot save. Open the page from its claude.ai link while signed in.'};
+    const p=payload();
+    await U.art.publish({'data/state.json':{content:JSON.stringify(p),contentType:'application/json'}});
+    U.dirty=false;U.saved=p.savedAt;toast('Saved. Everyone who opens this page now sees it.');
+    }
+  }catch(e){
+    const code=(e&&e.code)||'error',msg=(e&&e.message)||String(e);
+    if(code==='conflict')U.err='Someone saved first. Their version is loading, so redo your change and save again.';
+    else if(code==='not_writer'||code==='not_granted')U.err='Not saved: you have view-only access to this page.';
+    else U.err='Not saved ('+code+'): '+msg;
+    toast(U.err);
+  }
+  U.saving=false;const b2=$('#btnSave');if(b2)b2.textContent='Save for everyone';
+  updateStat();
+}
+async function loadShared(){
+  if(SHEET_URL){try{const p=await sheetGet();if(p&&p.weeks&&Object.keys(p.weeks).length&&!U.dirty){applyShared(p);if(p.hours)STATE.hours=Object.assign(STATE.hours,p.hours);if(p.dr)STATE.dr=p.dr;if(p.drMap)STATE.drMap=p.drMap;if(p.punchHC)STATE.punchHC=p.punchHC;U.saved=p.savedAt;render()}else if(p&&p.savedAt)U.saved=p.savedAt}catch(e){U.err='Could not read the Google Sheet: '+e.message;updateStat()}return}
+  try{
+    const r=await fetch('data/state.json',{cache:'no-store'});if(!r.ok)return;
+    const p=await r.json();if(!p||!p.weeks||U.dirty)return;
+    applyShared(p);if(p.hours)STATE.hours=Object.assign(STATE.hours,p.hours);if(p.dr)STATE.dr=p.dr;if(p.drMap)STATE.drMap=p.drMap;if(p.punchHC)STATE.punchHC=p.punchHC;U.saved=p.savedAt;render();
+  }catch(e){}
+}
+hashTab();window.addEventListener('hashchange',()=>{hashTab();render()});
+render();loadShared();
+(async()=>{try{if(window.claude&&claude.use){U.art=await claude.use('artifact');if(!U.art){U.readonly=true}updateStat()}else{U.readonly=true;updateStat()}}catch(e){U.readonly=true;updateStat()}})();
+</script>
