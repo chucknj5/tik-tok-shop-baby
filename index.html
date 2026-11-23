@@ -1368,7 +1368,11 @@ const uaCfg=()=>{let c={};try{c=JSON.parse(localStorage.getItem('lax_ua')||'{}')
 const uaSet=(k,v)=>{let c={};try{c=JSON.parse(localStorage.getItem('lax_ua')||'{}')}catch(e){}c[k]=v;try{localStorage.setItem('lax_ua',JSON.stringify(c))}catch(e){}};
 const todayISO=()=>{const d=new Date();return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0')};
 U.ua={open:false,from:todayISO(),to:todayISO(),busy:false};
-U.wu={date:todayISO(),people:[],at:0,status:'',q:'',on:true,tried:false,saved:null};
+U.wu={date:todayISO(),people:[],at:0,status:'',q:'',on:true,tried:false,saved:null,dept:''};
+const uwStamp=()=>{const d=new Date(),z=n=>String(n).padStart(2,'0');return d.getFullYear()+'-'+z(d.getMonth()+1)+'-'+z(d.getDate())+' '+z(d.getHours())+':'+z(d.getMinutes())+':'+z(d.getSeconds())};
+const uwTs=x=>/^\d{4}-\d\d-\d\d \d\d:\d\d/.test(x||'')?Date.parse(String(x).replace(' ','T')):0;
+const uwShow=x=>uwTs(x)?new Date(uwTs(x)).toLocaleString([],{month:'numeric',day:'numeric',hour:'numeric',minute:'2-digit'}):(x||'');
+const uwDeptOf=p=>p.deptName||p.dept||'';
 const UA_AREAS=()=>['UNASSIGNED',...Object.values(SS_AREAS)];
 async function uaFetch(start,end,pull){
   const c=uaCfg();if(!c.url)throw new Error('Add the uAttend sync link in uAttend settings.');
@@ -1424,40 +1428,46 @@ async function uwLoad(pull){
     let saved={};
     const sc=schCfg();
     if(sc.url){try{const r=await fetch(sc.url+(sc.url.includes('?')?'&':'?')+'what=floor&date='+w.date+'&t='+Date.now(),{cache:'no-store'});const f=JSON.parse(await r.text());if(f.ok&&f.rows)f.rows.forEach(x=>{saved[String(x[2]||x[1]).toLowerCase()]={area:x[0],moved:x[8]||''}})}catch(e){}}
-    w.people=uwBuild(j.header,j.rows||[],saved);w.at=Date.now();
-    w.status=(pull?'Pulled '+(j.rows||[]).length+' punches from uAttend. ':'')+w.people.filter(p=>p.on).length+' on the clock at '+hhmm(Date.now())+'.';
+    const prev={};(w.people||[]).forEach(p=>prev[p.key]=p);w.people=uwBuild(j.header,j.rows||[],saved);let kept=0;w.people.forEach(p=>{const e=prev[p.key];if(e&&uwTs(e.moved)>uwTs(p.moved)&&e.area!==p.area){p.area=e.area;p.moved=e.moved;kept++}});w.at=Date.now();
+    w.status=(pull?'Pulled '+(j.rows||[]).length+' punches from uAttend. ':'Synced. ')+w.people.filter(p=>p.on).length+' on the clock at '+hhmm(Date.now())+'.'+(kept?' Kept '+kept+' of your newer moves.':'');
   }catch(e){w.status='Could not load: '+e.message}
   w.busy=false;render();
 }
 let uwTimer=null;
-function uwSaveSoon(){clearTimeout(uwTimer);uwTimer=setTimeout(uwSave,700)}
+function uwSaveSoon(){clearTimeout(uwTimer);uwTimer=setTimeout(()=>{uwTimer=null;uwSave()},700)}
 async function uwSave(){
   const w=U.wu,sc=schCfg();
   if(!sc.url){w.status='Add the Google Sheet web app URL on the Schedule tab to save.';render();return}
-  const order=UA_AREAS(),P=w.people.slice().sort((a,b)=>(order.indexOf(a.area)<0?99:order.indexOf(a.area))-(order.indexOf(b.area)<0?99:order.indexOf(b.area))||a.name.localeCompare(b.name));
-  const rows=P.map(p=>[p.area,p.name,p.emp,p.dept,p.inn,p.out,p.on?'ON CLOCK':'OUT',p.moved||'']),cnt={};P.forEach(p=>{if(p.on)cnt[p.area]=(cnt[p.area]||0)+1});
   try{
+    let remote={},rrows=[];
+    try{const r=await fetch(sc.url+(sc.url.includes('?')?'&':'?')+'what=floor&date='+w.date+'&t='+Date.now(),{cache:'no-store'});const f=JSON.parse(await r.text());if(f.ok&&f.rows)f.rows.forEach(x=>{remote[String(x[2]||x[1]).toLowerCase()]=x;rrows.push(x)})}catch(e){}
+    let theirs=0;const mine={};
+    w.people.forEach(p=>{mine[p.key]=1;const x=remote[p.key];if(x&&uwTs(x[7])>uwTs(p.moved)&&x[0]!==p.area){p.area=x[0];p.moved=x[7];theirs++}});
+    const order=UA_AREAS(),P=w.people.slice().sort((a,b)=>(order.indexOf(a.area)<0?99:order.indexOf(a.area))-(order.indexOf(b.area)<0?99:order.indexOf(b.area))||a.name.localeCompare(b.name));
+    const rows=P.map(p=>[p.area,p.name,p.emp,p.dept,p.inn,p.out,p.on?'ON CLOCK':'OUT',p.moved||'']);
+    rrows.forEach(x=>{if(!mine[String(x[2]||x[1]).toLowerCase()])rows.push(x.slice(0,8))});
+    const cnt={};rows.forEach(r=>{if(r[6]==='ON CLOCK')cnt[r[0]]=(cnt[r[0]]||0)+1});
     const r=await fetch(sc.url,{method:'POST',headers:{'Content-Type':'text/plain;charset=utf-8'},body:JSON.stringify({kind:'floor',date:w.date,rows,counts:Object.keys(cnt).map(a=>[a,cnt[a]])})});
     const j=JSON.parse(await r.text());if(!j.ok)throw new Error(j.error||'the sheet rejected it');
-    w.status='Saved '+rows.length+' people to the Google Sheet at '+hhmm(Date.now())+'.';
+    w.status='Saved '+rows.length+' people to the Google Sheet at '+hhmm(Date.now())+(theirs?'. Kept '+theirs+' newer move'+(theirs>1?'s':'')+' made by someone else.':'.');
   }catch(e){w.status='Not saved to the Google Sheet: '+e.message+' (update the Schedule Google Sheet script if this says unknown)'}
   render();
 }
 function uwMove(key,area){
   const p=U.wu.people.find(x=>x.key===key);if(!p||p.area===area)return;
-  p.area=area;p.moved=new Date().toLocaleString([],{month:'numeric',day:'numeric',hour:'numeric',minute:'2-digit'});
+  p.area=area;p.moved=uwStamp();
   U.wu.status='Moved '+p.name+' to '+area+'. Saving…';render();uwSaveSoon();
 }
 function uwPanel(){
   const w=U.wu,order=UA_AREAS(),q=w.q.toLowerCase();
-  let h=`<div class="bar"><label>Day<input type="date" id="uwDate" value="${esc(w.date)}"></label><label class="ck" style="flex-direction:row;align-items:center;gap:6px;text-transform:none;letter-spacing:0;font-size:13px"><input type="checkbox" id="uwOn" ${w.on?'checked':''}> On the clock only</label><input id="uwQ" placeholder="Search name" value="${esc(w.q)}" style="padding:6px 10px;border:1px solid var(--line);border-radius:6px;background:var(--soft);color:var(--ink)"><div class="sp"></div><button id="uwRead">Refresh</button><button class="pri" id="uwPull">${w.busy?'Working…':'Pull from uAttend'}</button><button id="uwSave">Save to Google Sheet</button><button id="uaSet">uAttend settings</button></div>${uaSettingsHtml()}`;
+  let h=`<div class="bar"><label>Day<input type="date" id="uwDate" value="${esc(w.date)}"></label><label class="ck" style="flex-direction:row;align-items:center;gap:6px;text-transform:none;letter-spacing:0;font-size:13px"><input type="checkbox" id="uwOn" ${w.on?'checked':''}> On the clock only</label><input id="uwQ" placeholder="Search name" value="${esc(w.q)}" style="padding:6px 10px;border:1px solid var(--line);border-radius:6px;background:var(--soft);color:var(--ink)"><label>Department<select id="uwDept"><option value="">All departments</option>${[...new Set(w.people.map(uwDeptOf).filter(Boolean))].sort().map(d=>`<option ${d===w.dept?'selected':''}>${esc(d)}</option>`).join('')}</select></label><div class="sp"></div><button class="pri" id="uwRead" title="Reads the saved moves and punches other people entered">Sync</button><button id="uwPull">${w.busy?'Working…':'Pull from uAttend'}</button><button id="uwSave">Save to Google Sheet</button><button id="uaSet">uAttend settings</button></div>${uaSettingsHtml()}`;
   if(w.status)h+=`<div class="empty" style="padding:6px 0;font-weight:600">${esc(w.status)}</div>`;
   if(!w.at)return h+`<div class="empty">${w.busy?'Loading…':'Press Pull from uAttend to bring in who is on the clock. Then move each person to the right area and it saves to the Google Sheet.'}</div>`;
-  const P=w.people.filter(p=>(!w.on||p.on)&&(!q||p.name.toLowerCase().includes(q))),areas={};
+  const P=w.people.filter(p=>(!w.on||p.on)&&(!q||p.name.toLowerCase().includes(q))&&(!w.dept||uwDeptOf(p)===w.dept)),areas={};
   P.forEach(p=>(areas[p.area]=areas[p.area]||[]).push(p));
   const all=[...new Set([...order,...Object.keys(areas)])].filter(a=>!q||areas[a]);
   h+=`<div class="kpis"><div class="kpi"><div class="l">On the clock</div><div class="v">${w.people.filter(p=>p.on).length}</div><div class="s">${w.people.length} punched today · updated ${hhmm(w.at)}</div></div><div class="kpi"><div class="l">Unassigned</div><div class="v">${w.people.filter(p=>p.on&&p.area==='UNASSIGNED').length}</div><div class="s">still to place</div></div></div>`;
-  h+=`<div class="wgrid">${all.map(a=>{const L=(areas[a]||[]).sort((x,y)=>x.name.localeCompare(y.name));return `<div class="wcard" data-uarea="${esc(a)}"><div class="wh"><b>${esc(a)}</b><span>${L.length}</span></div>${L.length?`<ul>${L.map(p=>`<li draggable="true" data-ukey="${esc(p.key)}"><span class="nm">${esc(p.name)}</span><small>${esc(p.inn)}${p.on?'':' – '+esc(p.out)}</small><select class="mv" data-umv="${esc(p.key)}" title="Move to another area"><option value="">Move…</option>${order.filter(x=>x!==a).map(x=>`<option>${esc(x)}</option>`).join('')}</select></li>`).join('')}</ul>`:'<div class="empty" style="padding:4px 0">Nobody</div>'}</div>`}).join('')}</div>`;
+  h+=`<div class="wgrid">${all.map(a=>{const L=(areas[a]||[]).sort((x,y)=>x.name.localeCompare(y.name));return `<div class="wcard" data-uarea="${esc(a)}"><div class="wh"><b>${esc(a)}</b><span>${L.length}</span></div>${L.length?`<ul>${L.map(p=>`<li draggable="true" data-ukey="${esc(p.key)}"><span class="nm">${esc(p.name)}</span><small title="${esc(uwDeptOf(p))}${p.moved?' · moved '+esc(uwShow(p.moved)):''}">${esc(uwDeptOf(p))?esc(uwDeptOf(p))+' · ':''}${esc(p.inn)}${p.on?'':' – '+esc(p.out)}</small><select class="mv" data-umv="${esc(p.key)}" title="Move to another area"><option value="">Move…</option>${order.filter(x=>x!==a).map(x=>`<option>${esc(x)}</option>`).join('')}</select></li>`).join('')}</ul>`:'<div class="empty" style="padding:4px 0">Nobody</div>'}</div>`}).join('')}</div>`;
   return h;
 }
 function uaBind(){
@@ -1467,17 +1477,18 @@ function uaBind(){
   document.querySelectorAll('#uaSet').forEach(b=>b.addEventListener('click',()=>{U.ua.open=!U.ua.open;render()}));
   document.querySelectorAll('[data-ua]').forEach(i=>i.addEventListener('change',()=>uaSet(i.dataset.ua,i.value.trim())));
   on('uwDate','change',e=>{U.wu.date=e.target.value||todayISO();U.wu.at=0;U.wu.people=[];uwLoad(false)});
-  on('uwOn','change',e=>{U.wu.on=e.target.checked;render()});
+  on('uwOn','change',e=>{U.wu.on=e.target.checked;render()});on('uwDept','change',e=>{U.wu.dept=e.target.value;render()});
   on('uwQ','input',e=>{U.wu.q=e.target.value;const p=e.target.selectionStart;render();const el=$('#uwQ');if(el){el.focus();el.setSelectionRange(p,p)}});
   on('uwRead','click',()=>uwLoad(false));on('uwPull','click',()=>uwLoad(true));on('uwSave','click',uwSave);
   document.querySelectorAll('[data-umv]').forEach(sel=>sel.addEventListener('change',()=>{if(sel.value)uwMove(sel.dataset.umv,sel.value)}));
   document.querySelectorAll('.wcard li[data-ukey]').forEach(li=>li.addEventListener('dragstart',e=>{e.dataTransfer.setData('text/plain',li.dataset.ukey);e.dataTransfer.effectAllowed='move'}));
   document.querySelectorAll('.wcard[data-uarea]').forEach(card=>{card.addEventListener('dragover',e=>{e.preventDefault();card.classList.add('over')});card.addEventListener('dragleave',()=>card.classList.remove('over'));card.addEventListener('drop',e=>{e.preventDefault();card.classList.remove('over');const k=e.dataTransfer.getData('text/plain');if(k)uwMove(k,card.dataset.uarea)})});
   on('wMode','change',e=>{uaSet('mode',e.target.value);render()});
+  if(!window.__uwPoll){window.__uwPoll=setInterval(()=>{const a=document.activeElement;if(U.sec==='where'&&uaCfg().mode==='ua'&&U.wu.at&&!U.wu.busy&&!uwTimer&&!(a&&(a.tagName==='INPUT'||a.tagName==='SELECT')))uwLoad(false)},45000)}
   if(U.sec!=='attendance'&&!U.wu.tried&&uaCfg().key&&(U.sec==='where'&&uaCfg().mode==='ua'||U.sec==='reports')){U.wu.tried=true;uwLoad(false)}
 }
 /* ---------- Who's Punched In: live punches, punch issues, hour by hour ---------- */
-U.pi={days:1,header:null,rows:[],recs:[],at:0,busy:false,status:'',q:'',tried:false,hr:null,timer:null,saved:''};
+U.pi={dept:'',days:1,header:null,rows:[],recs:[],at:0,busy:false,status:'',q:'',tried:false,hr:null,timer:null,saved:''};
 const PI_LONG=12*60,PI_SHORT=30;
 const piDate=ms=>{const d=new Date(ms);return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0')};
 function piBuild(header,rows){
@@ -1494,7 +1505,7 @@ function piBuild(header,rows){
   return recs;
 }
 function piIssues(recs,now){
-  const out=[],add=(r,t,d)=>out.push({type:t,detail:d,name:r.name,emp:r.emp,date:r.date,inS:r.inS,outS:r.outS});
+  const out=[],add=(r,t,d)=>out.push({type:t,detail:d,name:r.name,emp:r.emp,dept:r.dept,deptName:r.deptName,date:r.date,inS:r.inS,outS:r.outS});
   const dur=m=>Math.floor(m/60)+'h '+String(Math.round(m%60)).padStart(2,'0')+'m';
   const by={};recs.forEach(r=>(by[r.key]=by[r.key]||[]).push(r));
   recs.forEach(r=>{
@@ -1551,11 +1562,11 @@ async function piSave(auto){
 }
 function punchedView(){
   const s=U.pi;let h=uaSettingsHtml();
-  h+=`<div class="bar"><label>Look back<select id="piDays">${[[1,'Yesterday + today (24 hr)'],[2,'2 days'],[3,'3 days'],[7,'7 days']].map(x=>`<option value="${x[0]}" ${x[0]===s.days?'selected':''}>${x[1]}</option>`).join('')}</select></label><button class="pri" id="piPull">${s.busy?'Pulling…':'Pull from uAttend'}</button><button id="piSave">Save to Google Sheet</button><button id="uaSet">uAttend settings</button><label>Search<input id="piQ" value="${esc(s.q)}" placeholder="Name or emp #"></label></div>`;
+  h+=`<div class="bar"><label>Look back<select id="piDays">${[[1,'Yesterday + today (24 hr)'],[2,'2 days'],[3,'3 days'],[7,'7 days']].map(x=>`<option value="${x[0]}" ${x[0]===s.days?'selected':''}>${x[1]}</option>`).join('')}</select></label><button class="pri" id="piPull">${s.busy?'Pulling…':'Pull from uAttend'}</button><button id="piSave">Save to Google Sheet</button><button id="uaSet">uAttend settings</button><label>Department<select id="piDept"><option value="">All departments</option>${[...new Set(s.recs.map(uwDeptOf).filter(Boolean))].sort().map(d=>`<option ${d===s.dept?'selected':''}>${esc(d)}</option>`).join('')}</select></label><label>Search<input id="piQ" value="${esc(s.q)}" placeholder="Name or emp #"></label></div>`;
   if(s.status)h+=`<div class="empty" style="padding:6px 0;font-weight:600">${esc(s.status)}</div>`;
   if(s.saved)h+=`<div class="empty" style="padding:2px 0">${esc(s.saved)}</div>`;
   if(!s.at)return h+`<div class="empty">${s.busy?'Loading…':'Press Pull from uAttend to see who is punched in, any punch issues to fix, and the hour by hour headcount for the past 24 hours.'}</div>`;
-  const now=s.at,q=s.q.toLowerCase(),match=x=>!q||x.name.toLowerCase().includes(q)||String(x.emp).toLowerCase().includes(q);
+  const now=s.at,q=s.q.toLowerCase(),match=x=>(!s.dept||uwDeptOf(x)===s.dept)&&(!q||x.name.toLowerCase().includes(q)||String(x.emp).toLowerCase().includes(q));
   const on=s.recs.filter(r=>r.open&&match(r)).sort((a,b)=>a.s-b.s),I=piIssues(s.recs,now),HR=piHours(s.recs,now),pk=Math.max(0,...HR.map(x=>x.n));
   const people=new Set(s.recs.map(r=>r.key)).size,onAll=s.recs.filter(r=>r.open).length;
   h+=`<div class="kpis"><div class="kpi"><div class="l">Punched in now</div><div class="v">${onAll}</div><div class="s">updated ${hhmm(now)}</div></div><div class="kpi"><div class="l">Punch issues</div><div class="v" style="${I.length?'color:#c0392b':''}">${I.length}</div><div class="s">to fix in uAttend</div></div><div class="kpi"><div class="l">People punched</div><div class="v">${people}</div><div class="s">in the pulled days</div></div><div class="kpi"><div class="l">Peak hour</div><div class="v">${pk}</div><div class="s">past 24 hours</div></div></div>`;
@@ -1569,7 +1580,7 @@ function punchedView(){
 function renderPunched(){
   $('#app').innerHTML=`<div class="wrap"><div class="top"><div><div class="eyebrow">LAX Sorting Center · Lyneer</div><h1>Who's <span>Punched</span> In</h1></div></div>${secNav()}${punchedView()}${hcSection()}</div>`;
   const on=(id,ev,fn)=>{const el=document.getElementById(id);if(el)el.addEventListener(ev,fn)};
-  on('piDays','change',e=>{U.pi.days=+e.target.value});on('piPull','click',piPull);on('piSave','click',()=>piSave(false));
+  on('piDays','change',e=>{U.pi.days=+e.target.value});on('piDept','change',e=>{U.pi.dept=e.target.value;render()});on('piPull','click',piPull);on('piSave','click',()=>piSave(false));
   on('piQ','input',e=>{U.pi.q=e.target.value;const p=e.target.selectionStart;render();const el=$('#piQ');if(el){el.focus();el.setSelectionRange(p,p)}});
   document.querySelectorAll('[data-pihr]').forEach(r=>r.addEventListener('click',()=>{U.pi.hr=U.pi.hr===+r.dataset.pihr?null:+r.dataset.pihr;render()}));
   document.querySelectorAll('[data-fday]').forEach(b=>b.addEventListener('click',()=>{U.fday=+b.dataset.fday;render()}));
