@@ -275,6 +275,7 @@ function render(){
   if(U.sec==='master')return renderMaster();if(U.sec==='reports')return renderReports();
   if(U.sec==='attendance')return renderAttendance();
   if(U.sec==='where')return renderWhere();
+  if(U.sec==='punched')return renderPunched();
   if(U.sec==='schedule')return renderSchedule();
   pickWeek();
   const app=$('#app'),keys=weekKeys();
@@ -477,7 +478,7 @@ function setCell(i,k,v){
   if(!Object.keys(r).length)delete day[i];
   markDirty();
 }
-function hashTab(){const h=location.hash.replace('#','').toLowerCase();U.sec=h==='master'?'master':h==='reports'?'reports':h==='attendance'?'attendance':h==='where'?'where':h==='schedule'?'schedule':'labor';const i=D3.map(x=>x.toLowerCase()).indexOf(h);U.tab=i>=0?'d'+i:'summary'}
+function hashTab(){const h=location.hash.replace('#','').toLowerCase();U.sec=h==='master'?'master':h==='reports'?'reports':h==='attendance'?'attendance':h==='where'?'where':h==='punched'?'punched':h==='schedule'?'schedule':'labor';const i=D3.map(x=>x.toLowerCase()).indexOf(h);U.tab=i>=0?'d'+i:'summary'}
 
 /* ---------- load workbooks ---------- */
 async function loadFiles(list){
@@ -495,7 +496,7 @@ async function loadFiles(list){
 }
 ['dragenter','dragover'].forEach(t=>document.addEventListener(t,e=>{e.preventDefault();const d=$('#drop')||$('#rdrop')||$('#adrop');d&&d.classList.add('over')}));
 document.addEventListener('dragleave',e=>{if(!e.relatedTarget){const d=$('#drop');d&&d.classList.remove('over')}});
-document.addEventListener('drop',e=>{e.preventDefault();const d=$('#drop')||$('#rdrop')||$('#adrop');d&&d.classList.remove('over');(U.sec==='master'?(()=>{}):U.sec==='reports'?loadReports:U.sec==='attendance'?loadPunch:U.sec==='where'?(()=>{}):loadFiles)([...e.dataTransfer.files])});
+document.addEventListener('drop',e=>{e.preventDefault();const d=$('#drop')||$('#rdrop')||$('#adrop');d&&d.classList.remove('over');(U.sec==='master'?(()=>{}):U.sec==='reports'?loadReports:U.sec==='attendance'?loadPunch:(U.sec==='where'||U.sec==='punched')?(()=>{}):loadFiles)([...e.dataTransfer.files])});
 
 /* ---------- weekly daily reports ---------- */
 const DR_ROLES=[['date','Date'],['shift','Shift'],['line','Line / area'],['hour','Hour of day'],['vol','Volume (pieces)'],['hrs','Labor hours']];
@@ -707,8 +708,8 @@ function wireReports(){
   document.querySelectorAll('[data-rm]').forEach(b=>b.addEventListener('click',()=>{const g=STATE.dr.files.splice(+b.dataset.rm,1)[0];if(g&&STATE.dr.blobs&&!STATE.dr.files.some(x=>x.file===g.file))delete STATE.dr.blobs[g.file];markDirty();render()}));
 }
 
-function secNav(){return `<div class="secs" role="tablist"><button type="button" class="sec ${U.sec==='master'?'on':''}" data-sec="master">Master Dashboard</button><button type="button" class="sec ${['master','reports','attendance','where','schedule'].includes(U.sec)?'':'on'}" data-sec="labor">Weekly Labor Request</button><button type="button" class="sec ${U.sec==='attendance'?'on':''}" data-sec="attendance">Attendance Points</button><button type="button" class="sec ${U.sec==='schedule'?'on':''}" data-sec="schedule">Schedule</button><button type="button" class="sec ${U.sec==='where'?'on':''}" data-sec="where">Who's Where</button><button type="button" class="sec ${U.sec==='reports'?'on':''}" data-sec="reports">Weekly Daily Reports</button></div>`}
-document.addEventListener('click',e=>{const b=e.target.closest&&e.target.closest('[data-sec]');if(!b)return;U.sec=b.dataset.sec;try{location.hash=U.sec==='master'?'master':U.sec==='reports'?'reports':U.sec==='attendance'?'attendance':U.sec==='where'?'where':U.sec==='schedule'?'schedule':(U.tab==='summary'?'summary':D3[+U.tab.slice(1)].toLowerCase())}catch(err){}render()});
+function secNav(){return `<div class="secs" role="tablist"><button type="button" class="sec ${U.sec==='master'?'on':''}" data-sec="master">Master Dashboard</button><button type="button" class="sec ${['master','reports','attendance','where','schedule','punched'].includes(U.sec)?'':'on'}" data-sec="labor">Weekly Labor Request</button><button type="button" class="sec ${U.sec==='punched'?'on':''}" data-sec="punched">Who's Punched In</button><button type="button" class="sec ${U.sec==='attendance'?'on':''}" data-sec="attendance">Attendance Points</button><button type="button" class="sec ${U.sec==='schedule'?'on':''}" data-sec="schedule">Schedule</button><button type="button" class="sec ${U.sec==='where'?'on':''}" data-sec="where">Who's Where</button><button type="button" class="sec ${U.sec==='reports'?'on':''}" data-sec="reports">Weekly Daily Reports</button></div>`}
+document.addEventListener('click',e=>{const b=e.target.closest&&e.target.closest('[data-sec]');if(!b)return;U.sec=b.dataset.sec;try{location.hash=U.sec==='master'?'master':U.sec==='reports'?'reports':U.sec==='attendance'?'attendance':U.sec==='where'?'where':U.sec==='punched'?'punched':U.sec==='schedule'?'schedule':(U.tab==='summary'?'summary':D3[+U.tab.slice(1)].toLowerCase())}catch(err){}render()});
 function markDirtyHC(nd){if(nd&&typeof markDirty==='function'){try{markDirty()}catch(e){}}}
 const WE_URL='https://tiktok-lyneer-daily.netlify.app/';
 const WE_HASH='7af3ad872ed0fd9bf6de575fec7ae6649a46c89780f827185529fc11293a29ba';
@@ -1474,6 +1475,109 @@ function uaBind(){
   document.querySelectorAll('.wcard[data-uarea]').forEach(card=>{card.addEventListener('dragover',e=>{e.preventDefault();card.classList.add('over')});card.addEventListener('dragleave',()=>card.classList.remove('over'));card.addEventListener('drop',e=>{e.preventDefault();card.classList.remove('over');const k=e.dataTransfer.getData('text/plain');if(k)uwMove(k,card.dataset.uarea)})});
   on('wMode','change',e=>{uaSet('mode',e.target.value);render()});
   if(U.sec!=='attendance'&&!U.wu.tried&&uaCfg().key&&(U.sec==='where'&&uaCfg().mode==='ua'||U.sec==='reports')){U.wu.tried=true;uwLoad(false)}
+}
+/* ---------- Who's Punched In: live punches, punch issues, hour by hour ---------- */
+U.pi={days:1,header:null,rows:[],recs:[],at:0,busy:false,status:'',q:'',tried:false,hr:null,timer:null,saved:''};
+const PI_LONG=12*60,PI_SHORT=30;
+const piDate=ms=>{const d=new Date(ms);return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0')};
+function piBuild(header,rows){
+  const ix=n=>header.indexOf(n),iL=ix('EMP L NAME'),iF=ix('EMP F NAME'),iE=ix('EMP##'),iD=ix('DATE'),iI=ix('IN'),iO=ix('OUT'),iC=ix('DEPT CODE'),iN=ix('DEPT NAME');
+  const recs=[];
+  rows.forEach(r=>{
+    const name=((String(r[iL]||'').trim()+', '+String(r[iF]||'').trim()).replace(/^, |, $/g,'')).trim();if(!name)return;
+    const date=toIsoDate(r[iD])||todayISO(),pin=parsePunch(r[iI]),pout=parsePunch(r[iO]);if(!pin&&!pout)return;
+    const abs=p=>iso2d(p.date||date).getTime()+p.min*60000;
+    let s=pin?abs(pin):null,e=pout?abs(pout):null;if(s!=null&&e!=null&&e<=s)e+=864e5;
+    const emp=String(r[iE]||'').trim();
+    recs.push({key:(emp||name).toLowerCase(),name,emp,dept:String(r[iC]||'').trim(),deptName:String(r[iN]||'').trim(),date,inS:String(r[iI]||'').trim(),outS:String(r[iO]||'').trim(),s,e,open:s!=null&&e==null,noIn:s==null&&e!=null});
+  });
+  return recs;
+}
+function piIssues(recs,now){
+  const out=[],add=(r,t,d)=>out.push({type:t,detail:d,name:r.name,emp:r.emp,date:r.date,inS:r.inS,outS:r.outS});
+  const dur=m=>Math.floor(m/60)+'h '+String(Math.round(m%60)).padStart(2,'0')+'m';
+  const by={};recs.forEach(r=>(by[r.key]=by[r.key]||[]).push(r));
+  recs.forEach(r=>{
+    if(r.noIn)add(r,'MISSING IN','Has an OUT punch but no IN punch.');
+    else if(r.open){const m=(now-r.s)/60000;if(m>PI_LONG)add(r,'MISSING OUT','Still punched in after '+dur(m)+'. Likely forgot to punch out.')}
+    else if(r.s!=null&&r.e!=null){const m=(r.e-r.s)/60000;if(m>PI_LONG)add(r,'LONG SHIFT',dur(m)+' between IN and OUT. Check for a missed punch.');else if(m<PI_SHORT)add(r,'SHORT PUNCH','Only '+Math.round(m)+' min between IN and OUT. Possible accidental punch.')}
+  });
+  Object.values(by).forEach(L=>{
+    const op=L.filter(r=>r.open);if(op.length>1)op.slice(1).forEach(r=>add(r,'MULTIPLE OPEN',op.length+' IN punches with no OUT for this person.'));
+    const T=L.filter(r=>r.s!=null).sort((a,b)=>a.s-b.s);
+    for(let i=1;i<T.length;i++){const p=T[i-1],c=T[i],pe=p.e!=null?p.e:now;if(c.s<pe&&!(p.open&&c.open))add(c,'OVERLAP','Overlaps the previous punch (IN '+p.inS+(p.outS?' to OUT '+p.outS:'')+').')}
+  });
+  const rank={'MISSING OUT':0,'MISSING IN':1,'MULTIPLE OPEN':2,'OVERLAP':3,'LONG SHIFT':4,'SHORT PUNCH':5};
+  return out.sort((a,b)=>rank[a.type]-rank[b.type]||a.name.localeCompare(b.name));
+}
+function piHours(recs,now){
+  const top=new Date(now);top.setMinutes(0,0,0);const t0=top.getTime(),H=[];
+  for(let i=23;i>=0;i--){
+    const a=t0-i*36e5,b=a+36e5,seen={};
+    recs.forEach(r=>{const s=r.s!=null?r.s:r.e,e=r.e!=null?r.e:now;if(s==null)return;if(s<b&&e>a&&a<=now)seen[r.key]=r.name});
+    const d=new Date(a);
+    H.push({a,date:piDate(a),h:d.getHours(),label:D3[(d.getDay()+6)%7]+' '+hrLabel(d.getHours()),n:Object.keys(seen).length,names:Object.values(seen).sort()});
+  }
+  return H;
+}
+async function piPull(){
+  const s=U.pi;if(s.busy)return;s.busy=true;s.status='Pulling punches from uAttend…';render();
+  try{
+    const to=todayISO(),from=piDate(Date.now()-s.days*864e5);
+    const j=await uaFetch(from,to,true);
+    s.header=j.header;s.rows=j.rows||[];s.recs=piBuild(s.header,s.rows);s.at=Date.now();
+    const f={file:'uAttend',name:'uAttend '+from+' to '+to,fdate:from,headers:j.header,data:s.rows},a=U.att;
+    a.files=a.files.filter(x=>x.file!=='uAttend');a.files.push(f);attAutoMap();const nd=attBuildHC();markDirtyHC(nd);
+    s.status='Pulled '+s.rows.length+' punches at '+hhmm(s.at)+'.';s.busy=false;render();
+    if(schCfg().url)piSave(true);return;
+  }catch(e){s.status='Could not pull from uAttend: '+e.message}
+  s.busy=false;render();
+}
+async function piSave(auto){
+  const s=U.pi,sc=schCfg();
+  if(!sc.url){s.saved='Add the Google Sheet web app URL on the Schedule tab to save.';render();return}
+  if(!s.at){s.saved='Pull from uAttend first.';render();return}
+  const now=s.at,H=piHours(s.recs,now),I=piIssues(s.recs,now);
+  const hours=H.map(x=>[x.date+' '+String(x.h).padStart(2,'0')+':00',x.label,x.n,x.names.join('; ')]);
+  const issues=I.map(x=>[x.date,x.emp,x.name,x.type,x.detail,x.inS,x.outS]);
+  const dates=[...new Set(s.recs.map(r=>r.date))];
+  s.saved='Saving to the Google Sheet…';if(!auto)render();
+  try{
+    const r=await fetch(sc.url,{method:'POST',headers:{'Content-Type':'text/plain;charset=utf-8'},body:JSON.stringify({kind:'punchhr',at:new Date(now).toLocaleString(),hours,issues,dates,onClock:s.recs.filter(r=>r.open).length})});
+    const j=JSON.parse(await r.text());if(!j.ok)throw new Error(j.error||'the sheet rejected it');
+    s.saved='Saved '+hours.length+' hours and '+issues.length+' punch issues to the Google Sheet at '+hhmm(Date.now())+'.';
+  }catch(e){s.saved='Not saved to the Google Sheet: '+e.message+' (the Schedule Google Sheet script needs the new version if this says unknown)'}
+  render();
+}
+function punchedView(){
+  const s=U.pi;let h=uaSettingsHtml();
+  h+=`<div class="bar"><label>Look back<select id="piDays">${[[1,'Yesterday + today (24 hr)'],[2,'2 days'],[3,'3 days'],[7,'7 days']].map(x=>`<option value="${x[0]}" ${x[0]===s.days?'selected':''}>${x[1]}</option>`).join('')}</select></label><button class="pri" id="piPull">${s.busy?'Pulling…':'Pull from uAttend'}</button><button id="piSave">Save to Google Sheet</button><button id="uaSet">uAttend settings</button><label>Search<input id="piQ" value="${esc(s.q)}" placeholder="Name or emp #"></label></div>`;
+  if(s.status)h+=`<div class="empty" style="padding:6px 0;font-weight:600">${esc(s.status)}</div>`;
+  if(s.saved)h+=`<div class="empty" style="padding:2px 0">${esc(s.saved)}</div>`;
+  if(!s.at)return h+`<div class="empty">${s.busy?'Loading…':'Press Pull from uAttend to see who is punched in, any punch issues to fix, and the hour by hour headcount for the past 24 hours.'}</div>`;
+  const now=s.at,q=s.q.toLowerCase(),match=x=>!q||x.name.toLowerCase().includes(q)||String(x.emp).toLowerCase().includes(q);
+  const on=s.recs.filter(r=>r.open&&match(r)).sort((a,b)=>a.s-b.s),I=piIssues(s.recs,now),HR=piHours(s.recs,now),pk=Math.max(0,...HR.map(x=>x.n));
+  const people=new Set(s.recs.map(r=>r.key)).size,onAll=s.recs.filter(r=>r.open).length;
+  h+=`<div class="kpis"><div class="kpi"><div class="l">Punched in now</div><div class="v">${onAll}</div><div class="s">updated ${hhmm(now)}</div></div><div class="kpi"><div class="l">Punch issues</div><div class="v" style="${I.length?'color:#c0392b':''}">${I.length}</div><div class="s">to fix in uAttend</div></div><div class="kpi"><div class="l">People punched</div><div class="v">${people}</div><div class="s">in the pulled days</div></div><div class="kpi"><div class="l">Peak hour</div><div class="v">${pk}</div><div class="s">past 24 hours</div></div></div>`;
+  h+=`<h3 style="margin-top:18px">Punch issues to fix</h3>`+(I.filter(match).length?`<div class="scroll"><table class="rt"><thead><tr><th class="p">Issue</th><th>Name</th><th>Emp #</th><th>Date</th><th>In</th><th>Out</th><th>What to check</th></tr></thead><tbody>${I.filter(match).map(x=>`<tr><td class="p"><b style="color:#c0392b">${x.type}</b></td><td>${esc(x.name)}</td><td>${esc(x.emp)}</td><td>${md(x.date)}</td><td>${esc(x.inS)||'–'}</td><td>${esc(x.outS)||'–'}</td><td style="text-align:left">${esc(x.detail)}</td></tr>`).join('')}</tbody></table></div>`:`<div class="empty">No punch issues found in the pulled days.</div>`);
+  h+=`<h3 style="margin-top:18px">Who is punched in now</h3>`+(on.length?`<div class="scroll"><table class="rt"><thead><tr><th class="p">Name</th><th>Emp #</th><th>Dept</th><th>In</th><th>Hours so far</th></tr></thead><tbody>${on.map(r=>{const m=(now-r.s)/60000;return `<tr><td class="p">${esc(r.name)}</td><td>${esc(r.emp)}</td><td>${esc(r.deptName||r.dept)}</td><td>${md(r.date)} ${esc(r.inS)}</td><td style="${m>PI_LONG?'color:#c0392b;font-weight:700':''}">${(m/60).toFixed(1)}</td></tr>`}).join('')}</tbody></table></div>`:`<div class="empty">No one is punched in${q?' matching that search':''}.</div>`);
+  h+=`<h3 style="margin-top:18px">Hour by hour · past 24 hours</h3><div class="scroll"><table class="rt"><thead><tr><th class="p">Hour</th><th>Headcount</th><th style="text-align:left;min-width:180px"></th></tr></thead><tbody>${HR.map((x,i)=>`<tr data-pihr="${i}" style="cursor:pointer;${s.hr===i?'outline:2px solid var(--brand)':''}"><td class="p">${x.label}</td><td><b>${x.n}</b></td><td style="text-align:left"><div style="height:10px;border-radius:5px;background:var(--reg);width:${pk?Math.round(x.n/pk*100):0}%"></div></td></tr>`).join('')}</tbody></table></div>`;
+  if(s.hr!=null&&HR[s.hr])h+=`<div class="panel" style="border-radius:10px;border-top:1px solid var(--line);margin:10px 0"><div class="ttl"><h2>${HR[s.hr].label}</h2><span class="m">${HR[s.hr].n} in</span></div><div style="columns:3 180px;font-size:13px">${HR[s.hr].names.map(n=>`<div>${esc(n)}</div>`).join('')||'<div class="empty">No one.</div>'}</div></div>`;
+  else h+=`<div class="empty" style="padding:6px 0;font-size:12px">Tap an hour to see who was in. Counts anyone on the clock at any point in that hour.</div>`;
+  return h;
+}
+function renderPunched(){
+  $('#app').innerHTML=`<div class="wrap"><div class="top"><div><div class="eyebrow">LAX Sorting Center · Lyneer</div><h1>Who's <span>Punched</span> In</h1></div></div>${secNav()}${punchedView()}${hcSection()}</div>`;
+  const on=(id,ev,fn)=>{const el=document.getElementById(id);if(el)el.addEventListener(ev,fn)};
+  on('piDays','change',e=>{U.pi.days=+e.target.value});on('piPull','click',piPull);on('piSave','click',()=>piSave(false));
+  on('piQ','input',e=>{U.pi.q=e.target.value;const p=e.target.selectionStart;render();const el=$('#piQ');if(el){el.focus();el.setSelectionRange(p,p)}});
+  document.querySelectorAll('[data-pihr]').forEach(r=>r.addEventListener('click',()=>{U.pi.hr=U.pi.hr===+r.dataset.pihr?null:+r.dataset.pihr;render()}));
+  document.querySelectorAll('[data-fday]').forEach(b=>b.addEventListener('click',()=>{U.fday=+b.dataset.fday;render()}));
+  on('hsel','change',e=>{U.hcweek=e.target.value;render()});on('hmode','change',e=>{U.hcMode=e.target.value;render()});
+  document.querySelectorAll('#uaSet').forEach(b=>b.addEventListener('click',()=>{U.ua.open=!U.ua.open;render()}));
+  document.querySelectorAll('[data-ua]').forEach(i=>i.addEventListener('change',()=>uaSet(i.dataset.ua,i.value.trim())));
+  if(!U.pi.tried&&uaCfg().key){U.pi.tried=true;piPull()}
+  clearInterval(U.pi.timer);U.pi.timer=setInterval(()=>{if(U.sec!=='punched'){clearInterval(U.pi.timer);return}if(!document.activeElement||document.activeElement.tagName!=='INPUT')piPull()},300000);
 }
 /* ---------- master dashboard: fill rates (labor request vs punch report) ---------- */ const M_G=[['o','Opening','12:00a–6:59a'],['e','Early','7:00a–12:00p'],['m','Mid','12:01p–2:00p'],['r','Regular','2:01p +']]; U.mwk=null; const mPct=(a,b)=>b>0?Math.round(a/b*100):null; const mCol=p=>p==null?'var(--mute)':p>=95?'#1e8e5a':p>=85?'#b7791f':'#c0392b'; const mTxt=p=>p==null?'–':p+'%'; function mWeek(wk){ const mode=U.hcMode==='t'?'t':'d',w=STATE.weeks[wk]; const days=[0,1,2,3,4,5,6].map(d=>{ const date=addDays(wk,d),pc=(STATE.punchHC||{})[date],fd=fillData(wk,d),req={o:0,e:0,m:0,r:0}; Object.values((w&&w.days&&w.days[d])||{}).forEach(r=>[1,2].forEach(s=>['o','e','m','r'].forEach(g=>{req[g]+=num(r[g+s])}))); const reqT=req.o+req.e+req.m+req.r,hasReq=reqT>0&&fd.plan.some(v=>v>0),hasPun=!!pc; const act=pc?pc[mode]:new Array(36).fill(0),got=pc&&pc.g?pc.g:null; let ph=0,ah=0,pk=0,ak=0; for(let h=0;h<36;h++){if(fd.plan[h]>0){ph+=fd.plan[h];ah+=act[h]||0}pk=Math.max(pk,fd.plan[h]);ak=Math.max(ak,act[h]||0)} const gotT=got?got.o+got.e+got.m+got.r:null,filled=got?['o','e','m','r'].reduce((s,g)=>s+Math.min(req[g],got[g]),0):null; return {d,date,req,reqT,hasReq,hasPun,plan:fd.plan,act,got,gotT,filled,ph,ah,pk,ak,people:pc?pc.n:0, startFill:hasReq&&got?mPct(filled,reqT):null,hrFill:hasReq&&hasPun?mPct(ah,ph):null}; }); const both=days.filter(x=>x.hasReq&&x.hasPun),sg=days.filter(x=>x.hasReq&&x.got); const T={reqT:sg.reduce((s,x)=>s+x.reqT,0),gotT:sg.reduce((s,x)=>s+x.gotT,0),filled:sg.reduce((s,x)=>s+x.filled,0),ph:both.reduce((s,x)=>s+x.ph,0),ah:both.reduce((s,x)=>s+x.ah,0),n:both.length}; T.startFill=mPct(T.filled,T.reqT);T.hrFill=mPct(T.ah,T.ph); return {wk,days,T,mode}; } function mWeeks(){return [...new Set([...weekKeys(),...Object.keys(STATE.punchHC||{}).map(mondayOf)])].sort()} function mBars(M){ const W_=640,H=250,L=36,R=10,TP=22,B=34,iw=W_-L-R,ih=H-TP-B,gw=iw/7,top=Math.max(120,...M.days.flatMap(x=>[x.startFill||0,x.hrFill||0])),t2=Math.ceil(top/20)*20,yp=v=>TP+ih-v/t2*ih; let s=`<svg viewBox="0 0 ${W_} ${H}" width="100%" role="img" aria-label="Daily fill rates">`; for(let v=0;v<=t2;v+=20)s+=`<line x1="${L}" x2="${W_-R}" y1="${yp(v)}" y2="${yp(v)}" stroke="${v===100?'var(--mute)':'var(--line)'}" ${v===100?'stroke-dasharray="4 3"':''}/><text x="${L-5}" y="${yp(v)+4}" text-anchor="end" font-size="10">${v}%</text>`; M.days.forEach((x,i)=>{const cx=L+gw*i+gw/2,bw=Math.min(26,gw/2-6); [[x.startFill,'var(--early)',-bw-2],[x.hrFill,'var(--reg)',2]].forEach(([v,c,o])=>{if(v==null)return;s+=`<rect x="${cx+o}" y="${yp(v)}" width="${bw}" height="${yp(0)-yp(v)}" fill="${c}" rx="2"/><text x="${cx+o+bw/2}" y="${yp(v)-4}" text-anchor="middle" font-size="10" font-weight="700">${v}</text>`}); s+=`<text x="${cx}" y="${H-16}" text-anchor="middle" font-size="11">${D3[i]}</text><text x="${cx}" y="${H-4}" text-anchor="middle" font-size="9" fill="var(--mute)">${md(x.date)}</text>`}); return s+'</svg>'; } function masterView(){ const weeks=mWeeks(); if(!weeks.length)return `<div class="panel" style="border-radius:10px;border-top:1px solid var(--line)"><div class="empty">Nothing to compare yet. Load the Weekly Labor Request (Weekly Labor Request tab) and drop the punch report on the Attendance Points tab. Fill rates for each day and week show here.</div></div>`; if(!U.mwk||!weeks.includes(U.mwk)){const w=[...weeks].reverse().find(k=>{const x=mWeek(k);return x.T.n>0});U.mwk=w||weeks[weeks.length-1]} const wk=U.mwk,M=mWeek(wk),T=M.T,mode=M.mode; let h=`<div class="row"><label class="ck">Week of <select id="mwk">${weeks.map(k=>`<option value="${k}" ${k===wk?'selected':''}>${mdy(k)} – ${mdy(addDays(k,6))}</option>`).join('')}</select></label><label class="ck">Hourly count <select id="mmode"><option value="d" ${mode==='d'?'selected':''}>anyone on the clock during the hour</option><option value="t" ${mode==='t'?'selected':''}>on the clock at the top of the hour</option></select></label></div>`; if(!T.n&&!M.days.some(x=>x.got&&x.hasReq))h+=`<div class="empty">This week needs both a labor request with headcounts/start times and a punch report for the same days.</div>`; const short=M.days.filter(x=>x.hasReq&&x.got).reduce((s,x)=>s+['o','e','m','r'].reduce((q,g)=>q+Math.max(0,x.req[g]-x.got[g]),0),0); h+=`<div class="kpis"><div class="kpi"><div class="l">Start-time fill · week</div><div class="v" style="color:${mCol(T.startFill)}">${mTxt(T.startFill)}</div><div class="s">${fmt(T.filled)} of ${fmt(T.reqT)} requested starts filled</div></div> <div class="kpi"><div class="l">Hr-over-hr fill · week</div><div class="v" style="color:${mCol(T.hrFill)}">${mTxt(T.hrFill)}</div><div class="s">${fmt(T.ah)} of ${fmt(T.ph)} headcount-hours</div></div> <div class="kpi"><div class="l">Short at start</div><div class="v">${short?fmt(short):'–'}</div><div class="s">requested starts with no matching punch-in</div></div> <div class="kpi"><div class="l">Days compared</div><div class="v">${T.n}</div><div class="s">of 7 with request + punches</div></div></div>`; {const lw=STATE.weeks[wk];if(lw){const LT=weekTotals(lw);if(LT.total>0)h+=`<h3>Headcount by day · weekly labor request</h3>${chart(LT,wk)}`}}
   h+=`<h3>Fill rate by day</h3><div class="legend"><span><i style="background:var(--early)"></i>Start-time fill</span><span><i style="background:var(--reg)"></i>Hr-over-hr fill</span></div>${mBars(M)}`; h+=`<div class="scroll"><table class="rt"><thead><tr><th class="p">Day</th><th>Requested starts</th><th>Punched in at start</th><th>Start fill</th><th>Hr-over-hr requested</th><th>Hr-over-hr actual</th><th>Hr fill</th><th>Peak req / act</th></tr></thead><tbody>${M.days.map(x=>`<tr><td class="p">${D3[x.d]} ${md(x.date)}</td><td>${x.reqT?fmt(x.reqT):'–'}</td><td>${x.gotT!=null?fmt(x.gotT):(x.hasPun?'re-drop punch':'–')}</td><td><b style="color:${mCol(x.startFill)}">${mTxt(x.startFill)}</b></td><td>${x.hasReq?fmt(x.ph):'–'}</td><td>${x.hasReq&&x.hasPun?fmt(x.ah):'–'}</td><td><b style="color:${mCol(x.hrFill)}">${mTxt(x.hrFill)}</b></td><td>${x.hasReq||x.hasPun?fmt(x.pk)+' / '+fmt(x.ak):'–'}</td></tr>`).join('')}<tr class="tot"><td class="p">WEEK</td><td>${fmt(T.reqT)}</td><td>${fmt(T.gotT)}</td><td><b style="color:${mCol(T.startFill)}">${mTxt(T.startFill)}</b></td><td>${fmt(T.ph)}</td><td>${fmt(T.ah)}</td><td><b style="color:${mCol(T.hrFill)}">${mTxt(T.hrFill)}</b></td><td></td></tr></tbody></table></div>`; h+=`<h3 style="margin-top:22px">Start-time fill by start group · requested vs first punch-in</h3><div class="scroll"><table class="rt"><thead><tr><th class="p">Start group</th>${M.days.map(x=>`<th>${D3[x.d]}<br>${md(x.date)}</th>`).join('')}<th>Week</th></tr></thead><tbody>${M_G.map(([g,n,r])=>{let rq=0,ac=0;const cells=M.days.map(x=>{if(!(x.hasReq&&x.got))return `<td>${x.req[g]?fmt(x.req[g])+' req':'–'}</td>`;rq+=x.req[g];ac+=x.got[g];const p=mPct(x.got[g],x.req[g]);return `<td><b style="color:${mCol(p)}">${p==null?(x.got[g]?'+'+x.got[g]:'–'):p+'%'}</b><br><small>${x.got[g]} / ${x.req[g]}</small></td>`}).join('');const p=mPct(ac,rq);return `<tr><td class="p">${n}<br><small>${r}</small></td>${cells}<td><b style="color:${mCol(p)}">${mTxt(p)}</b><br><small>${ac} / ${rq}</small></td></tr>`}).join('')}</tbody></table></div><div class="empty" style="padding:6px 0;font-size:12px">Start fill = requested starts filled ÷ requested, counted by group (a group can't fill more than it requested, so extra Early punches don't cover a short Regular). Requested = headcount on the labor request for that start group. Punched = people whose first punch-in that day falls in the group's window (Opening 12:00a–6:59a, Early 7:00a–12:00p, Mid 12:01p–2:00p, Regular 2:01p and later). Punch days loaded before this tab existed show "re-drop punch": drop that punch report once on Attendance Points to fill them in.</div>`; const hrs=[];for(let i=0;i<36;i++)if(M.days.some(x=>x.plan[i]>0||x.act[i]>0))hrs.push(i); if(hrs.length)h+=`<h3 style="margin-top:22px">Hour over hour fill · actual ÷ requested on site</h3><div class="scroll"><table class="rt"><thead><tr><th class="p">Hour</th>${M.days.map(x=>`<th>${D3[x.d]}<br>${md(x.date)}</th>`).join('')}</tr></thead><tbody>${hrs.map(i=>`<tr><td class="p">${hrLabel(i)}</td>${M.days.map(x=>{const p=x.plan[i],a=x.act[i]||0;if(!(x.hasReq&&x.hasPun))return `<td>${p?fmt(p)+' req':a?a:'–'}</td>`;const q=mPct(a,p);return `<td title="${a} on site, ${p} requested"><b style="color:${mCol(q)}">${q==null?(a?'+'+a:'–'):q+'%'}</b><br><small>${a} / ${p}</small></td>`}).join('')}</tr>`).join('')}</tbody></table></div>`; const ws=weeks.slice(-8).map(k=>mWeek(k)).filter(x=>x.T.n>0||x.T.reqT>0); if(ws.length>1)h+=`<h3 style="margin-top:22px">Week over week</h3><div class="scroll"><table class="rt"><thead><tr><th class="p">Week of</th><th>Days compared</th><th>Start fill</th><th>Hr-over-hr fill</th><th>Requested starts</th><th>Punched at start</th></tr></thead><tbody>${ws.map(x=>`<tr><td class="p">${mdy(x.wk)}</td><td>${x.T.n}</td><td><b style="color:${mCol(x.T.startFill)}">${mTxt(x.T.startFill)}</b></td><td><b style="color:${mCol(x.T.hrFill)}">${mTxt(x.T.hrFill)}</b></td><td>${fmt(x.T.reqT)}</td><td>${fmt(x.T.gotT)}</td></tr>`).join('')}</tbody></table></div>`; return `<div class="panel" style="border-radius:10px;border-top:1px solid var(--line)">${h}</div>`; } function renderMaster(){ $('#app').innerHTML=`<div class="wrap"><div class="top"><div><div class="eyebrow">LAX Sorting Center · Lyneer</div><h1>Master <span>Dashboard</span></h1></div></div>${secNav()}${masterView()}</div>`; const on=(id,ev,fn)=>{const el=document.getElementById(id);if(el)el.addEventListener(ev,fn)}; on('mwk','change',e=>{U.mwk=e.target.value;renderMaster()});on('mmode','change',e=>{U.hcMode=e.target.value;renderMaster()}); } function wsTimer(){clearInterval(U.ws.timer);U.ws.timer=null;if(U.sec==='where'&&uaCfg().mode!=='ua'&&ssCfg().auto)U.ws.timer=setInterval(()=>{if(U.sec!=='where'){clearInterval(U.ws.timer);return}if(!document.activeElement||document.activeElement.tagName!=='INPUT')wsSync(false)},120000)}
